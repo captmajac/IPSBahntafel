@@ -8,7 +8,7 @@ Gedacht für das Tablet zu Hause: „Wann muss ich los?“ und „Wann kommt mei
 
 | Modul | Beschreibung |
 |---|---|
-| [Bahntafel](Bahntafel/README.md) | Abfahrts- und Ankunftstafel eines Bahnhofs mit Echtzeitdaten, Richtungsfilter und Erreichbarkeit, als HTML-Box und Kachel |
+| [Bahntafel](Bahntafel/README.md) | Abfahrts- und Ankunftstafel eines Bahnhofs mit Echtzeitdaten, Zielbahnhof-Filter und Erreichbarkeit, als HTML-Box und Kachel |
 
 ## Voraussetzungen
 

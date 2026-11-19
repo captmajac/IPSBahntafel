@@ -51,7 +51,7 @@ class BoardHtml
     private static function row(array $row, int $i, array $meta): string
     {
         $background = ['missed' => self::MISSED_BG, 'tight' => self::TIGHT_BG][$row['reach']] ?? ($i % 2 === 0 ? '#333333' : '#2b2b2b');
-        $style = 'background:' . $background . ';' . ($row['cancelled'] || $row['offRoute'] ? 'opacity:0.5;' : '');
+        $style = 'background:' . $background . ';' . ($row['cancelled'] ? 'opacity:0.5;' : '');
         $cell = "<td style='padding:10px;vertical-align:middle;border-bottom:1px solid #444;'>";
         $white = fn (string $text, bool $red) => "<b style='color:" . ($red ? self::RED : '#ffffff') . ";'>" . self::e($text) . '</b>';
         $small = fn (string $text) => "<br/><span style='font-size:11px;color:#a0a0a0;'>" . self::e($text) . '</span>';

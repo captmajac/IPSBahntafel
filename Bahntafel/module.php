@@ -41,7 +41,6 @@ class Bahntafel extends IPSModule
         $this->RegisterPropertyString('StationSearch', '');  // search text above the station list
         $this->RegisterPropertyString('Station', '');
         $this->RegisterPropertyString('RouteStation', '');
-        $this->RegisterPropertyInteger('OffRoute', 0);  // 0 hide, 1 grey
         foreach (self::GROUPS as $property => $group) {
             $this->RegisterPropertyBoolean($property, $group !== TrainBadge::BUS);
         }
@@ -284,7 +283,6 @@ class Bahntafel extends IPSModule
             'board'     => $this->board(),
             'groups'    => $groups,
             'route'     => $this->ReadPropertyString('RouteStation'),
-            'offRoute'  => $this->ReadPropertyInteger('OffRoute') === 1 ? 'grey' : 'hide',
             'rows'      => $this->ReadPropertyInteger('Rows'),
             'walk'      => $this->ReadPropertyInteger('WalkMinutes'),
             'tolerance' => $this->ReadPropertyInteger('ToleranceMinutes'),
@@ -388,7 +386,7 @@ class Bahntafel extends IPSModule
             $names[] = $route;
         }
         sort($names, SORT_STRING | SORT_FLAG_CASE);
-        $options = [self::option($this->Translate("(none)"), '')];
+        $options = [self::option($this->Translate("(all trains)"), '')];
         foreach ($names as $name) {
             $options[] = self::option($name, $name);
         }

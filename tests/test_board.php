@@ -24,7 +24,7 @@ function settings(array $over = []): array
 {
     return array_merge([
         'board' => 'dep', 'groups' => [TrainBadge::LONG, TrainBadge::REGIONAL, TrainBadge::SBAHN, TrainBadge::TRAM, TrainBadge::OTHER],
-        'route' => '', 'offRoute' => 'hide', 'rows' => 10, 'walk' => 0, 'tolerance' => 4,
+        'route' => '', 'rows' => 10, 'walk' => 0, 'tolerance' => 4,
     ], $over);
 }
 
@@ -64,15 +64,11 @@ $tests['Board: groups filter'] = function () {
     check(ids($rows) === ['re'], json_encode(ids($rows)));
 };
 
-$tests['Board: route by departure path, hidden or grey'] = function () {
+$tests['Board: destination by departure path, other trains hidden'] = function () {
     $trips = [trip('to', 5, ['dep' => ['path' => ['Großstadt Hbf', 'Grenzstadt']]]), trip('other', 6, ['dep' => ['path' => ['Nordstadt']]])];
     $rows = BoardBuilder::build($trips, TestRegistry::$now, settings(['route' => 'Großstadt Hbf']));
-    check(ids($rows) === ['to'], 'hide');
-    $rows = BoardBuilder::build($trips, TestRegistry::$now, settings(['route' => 'Großstadt Hbf', 'offRoute' => 'grey', 'walk' => 2]));
-    check(ids($rows) === ['to', 'other'] && $rows[0]['offRoute'] === false && $rows[1]['offRoute'] === true, 'grey');
-    check($rows[1]['reach'] === null && $rows[0]['reach'] !== null, 'no reach on grey rows');
-    $rows = BoardBuilder::build($trips, TestRegistry::$now, settings());
-    check(array_column($rows, 'offRoute') === [false, false], 'no route');
+    check(ids($rows) === ['to'] && !array_key_exists('offRoute', $rows[0]), 'only the destination');
+    check(ids(BoardBuilder::build($trips, TestRegistry::$now, settings())) === ['to', 'other'], 'all trains');
 };
 
 $tests['Board: route by arrival path'] = function () {
@@ -81,10 +77,8 @@ $tests['Board: route by arrival path'] = function () {
     check(ids($rows) === ['from'], json_encode(ids($rows)));
 };
 
-$tests['Board: rows limit after filtering, grey rows count'] = function () {
+$tests['Board: rows limit after filtering'] = function () {
     $trips = [trip('a', 5, ['dep' => ['path' => ['Nordstadt']]]), trip('b', 6), trip('c', 7)];
-    $rows = BoardBuilder::build($trips, TestRegistry::$now, settings(['rows' => 2, 'route' => 'Großstadt Hbf', 'offRoute' => 'grey']));
-    check(ids($rows) === ['a', 'b'], json_encode(ids($rows)));
     $rows = BoardBuilder::build($trips, TestRegistry::$now, settings(['rows' => 2, 'route' => 'Großstadt Hbf']));
     check(ids($rows) === ['b', 'c'], json_encode(ids($rows)));
 };
@@ -142,19 +136,16 @@ $tests['Board: route stations and next train'] = function () {
     $rows = BoardBuilder::build([
         trip('cancelled', 30, ['dep' => ['cancelled' => true]]),
         trip('missed', 10),
-        trip('grey', 31, ['dep' => ['path' => ['Nordstadt']]]),
         trip('next', 32),
-    ], TestRegistry::$now, settings(['walk' => 20, 'route' => 'Großstadt Hbf', 'offRoute' => 'grey']));
+    ], TestRegistry::$now, settings(['walk' => 20]));
     check(BoardBuilder::nextTrain($rows)['id'] === 'next', 'next');
     check(BoardBuilder::nextTrain([]) === null, 'none');
 };
 
 $tests['Board: route station matches in another spelling'] = function () {
     $trips = [trip('a', 10, ['dep' => ['path' => ['Großstadt (Main) Hbf', 'Grenzstadt']]])];
-    $rows = BoardBuilder::build($trips, TestRegistry::$now, settings(['route' => 'Großstadt(Main)Hbf', 'offRoute' => 'grey']));
-    check($rows[0]['offRoute'] === false, 'same station');
-    $rows = BoardBuilder::build($trips, TestRegistry::$now, settings(['route' => 'Großstadt Süd', 'offRoute' => 'grey']));
-    check($rows[0]['offRoute'] === true, 'other station');
+    check(ids(BoardBuilder::build($trips, TestRegistry::$now, settings(['route' => 'Großstadt(Main)Hbf']))) === ['a'], 'same station');
+    check(BoardBuilder::build($trips, TestRegistry::$now, settings(['route' => 'Großstadt Süd'])) === [], 'other station');
 };
 
 $tests['Board: extended messages only when enabled'] = function () {

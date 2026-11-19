@@ -7,7 +7,7 @@ function row(array $over = []): array
     return array_merge([
         'id' => 'a', 'line' => 'S1', 'operator' => 'SBX', 'badge' => 'S', 'time' => TestRegistry::$now + 26 * 60, 'delayed' => false,
         'platform' => '13', 'platformChanged' => false, 'cancelled' => false, 'direction' => 'Südstadt Hbf',
-        'minutesLeft' => 26, 'continuesTo' => '', 'reach' => null, 'offRoute' => false, 'messages' => [],
+        'minutesLeft' => 26, 'continuesTo' => '', 'reach' => null, 'messages' => [],
     ], $over);
 }
 
@@ -58,10 +58,9 @@ $tests['Html: arrival status, and departure without walk time like arrival'] = f
     }
 };
 
-$tests['Html: cancelled and off-route rows are greyed'] = function () {
-    $html = BoardHtml::render([row(['line' => 'L1', 'cancelled' => true]), row(['id' => 'b', 'line' => 'L2', 'offRoute' => true]), row(['id' => 'c', 'line' => 'L3'])], meta());
+$tests['Html: cancelled rows are greyed'] = function () {
+    $html = BoardHtml::render([row(['line' => 'L1', 'cancelled' => true]), row(['id' => 'c', 'line' => 'L3'])], meta());
     check(str_contains(rowHtml($html, '>L1<'), 'opacity:0.5'), 'cancelled');
-    check(str_contains(rowHtml($html, '>L2<'), 'opacity:0.5'), 'off route');
     check(!str_contains(rowHtml($html, '>L3<'), 'opacity:0.5'), 'normal');
 };
 

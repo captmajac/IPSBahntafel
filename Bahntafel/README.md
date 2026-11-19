@@ -1,6 +1,6 @@
 # Bahntafel
 
-Abfahrts- und Ankunftstafel eines festen Heimatbahnhofs aus der DB OpenBoards API, mit Verspätungen, Ausfällen, Gleiswechseln und Hinweisen. Optional lässt sich die Tafel auf eine Richtung einschränken und zeigt dann, ob man einen Zug von zu Hause noch erreicht.
+Abfahrts- und Ankunftstafel eines festen Heimatbahnhofs aus der DB OpenBoards API, mit Verspätungen, Ausfällen, Gleiswechseln und Hinweisen. Optional lässt sich die Tafel auf einen Zielbahnhof einschränken. Außerdem zeigt sie, ob man einen Zug von zu Hause noch erreicht.
 
 ### Inhaltsverzeichnis
 
@@ -16,7 +16,7 @@ Abfahrts- und Ankunftstafel eines festen Heimatbahnhofs aus der DB OpenBoards AP
 
 - Abfahrt und Ankunft eines Bahnhofs, umschaltbar, mit Echtzeitdaten (Verspätung als rote Zeit, Gleiswechsel als rotes Gleis, Ausfälle, Gründe für Verspätungen und Störungen).
 - Auf Wunsch erweiterte Hinweise wie „Ein Wagen fehlt“ oder „Hohe Auslastung“.
-- Filter nach Zuggattung und optional nach Richtung („Richtung (Zug hält in)“): andere Züge ausblenden oder grau darstellen.
+- Filter nach Zuggattung und optional nach Zielbahnhof: Abfahrt nur Züge dorthin, Ankunft nur Züge von dort.
 - Erreichbarkeit bei Abfahrt aus Wegezeit und Toleranz: *erreichbar*, *knapp*, *nicht erreichbar*, mit farbig hinterlegten Zeilen.
 - HTML-Box für das alte WebFront und Kachel für die Tile-Visualisierung.
 
@@ -46,13 +46,13 @@ Kompatibilität: alle Bahnhöfe in Deutschland, die die DB API kennt. Die Tafel 
 
 Unter *Instanz hinzufügen* die Instanz *Bahntafel* auswählen. Für mehrere Bahnhöfe legt man mehrere Instanzen an.
 
-Die Einstellungen sind in vier aufklappbare Bereiche gegliedert: *Zugang zur DB API*, *Heimatbahnhof und Richtung*, *Anzeige* und *Erreichbarkeit*.
+Die Einstellungen sind in vier aufklappbare Bereiche gegliedert: *Zugang zur DB API*, *Heimat- und Zielbahnhof*, *Anzeige* und *Erreichbarkeit*.
 
 1. Unter *Zugang zur DB API* Client-ID und API-Key eintragen. „Verbindung testen“ prüft die Zugangsdaten und meldet den Namen des Bahnhofs, ohne gewählten Bahnhof den von Frankfurt (Main) Hbf. Solange Zugangsdaten fehlen, ist dieser Bereich aufgeklappt.
 2. Bei „Bahnhofsname oder EVA-Nummer“ den Namen (z. B. `WohnortBahnhof`) oder die 7-stellige EVA-Nummer eingeben und „Suchen“ klicken. Der erste Treffer steht dann direkt darunter unter „Heimatbahnhof“. Passt er nicht, dort einen anderen Treffer wählen. Dann übernehmen.
-3. Optional die Richtung festlegen: unter „Richtung (Zug hält in)“ z. B. `Großstadt Hbf` wählen. Die Liste füllt sich, sobald ein Heimatbahnhof gewählt ist, mit den Bahnhöfen seiner Züge in den nächsten ein bis zwei Stunden. Speichern ist dafür nicht nötig. Bei „Andere Züge“ entscheidest du, ob Züge, die nicht an diesem Bahnhof halten, ausgeblendet oder grau dargestellt werden. Ausgeblendete Züge verkürzen die Tafel nicht, das Modul lädt dann weitere Stunden.
-   - Abfahrt: Züge, die danach an dem Bahnhof halten.
-   - Ankunft: Züge, die vorher an dem Bahnhof gehalten haben. Die Tafel zeigt dann, woher der Zug kommt und wohin er weiterfährt.
+3. Optional unter „Zielbahnhof“ z. B. `Großstadt Hbf` wählen. Die Abfahrtstafel zeigt dann nur Züge nach Großstadt Hbf, die Ankunftstafel nur Züge von dort. „(alle Züge)“ hebt die Einschränkung wieder auf. Die Liste füllt sich, sobald ein Heimatbahnhof gewählt ist, mit den Bahnhöfen seiner Züge in den nächsten ein bis zwei Stunden. Speichern ist dafür nicht nötig. Die ausgeblendeten Züge verkürzen die Tafel nicht, das Modul lädt dann weitere Stunden.
+   - Abfahrt: Züge, die danach am Zielbahnhof halten, auch wenn sie weiterfahren.
+   - Ankunft: Züge, die vorher am Zielbahnhof gehalten haben, auch wenn sie woanders gestartet sind. Die Tafel zeigt, woher der Zug kommt und wohin er weiterfährt.
 4. Optional unter *Erreichbarkeit* die Wegezeit von zu Hause zum Bahnhof eintragen, und zwar entspannt gegangen, dazu wie viele Minuten man mit zügigem Gehen spart. Die Abfahrtstafel zeigt dann *erreichbar* (entspannt), *knapp* (nur zügig) oder *nicht erreichbar*.
 5. Optional „Instanz nach Bahnhof benennen“: Die Instanz und damit die Kachel heißt dann wie der Bahnhof. Das Modul ändert Namen und Icons sonst nie selbst.
 
@@ -66,8 +66,7 @@ Unter der Instanz liegen:
 |---|---|
 | Client-ID, API-Key | Zugangsdaten aus dem DB API Marketplace |
 | Heimatbahnhof | über die Suche nach Name oder EVA-Nummer wählen |
-| Richtung (Zug hält in) | Optional: nur Züge, die dort halten (Abfahrt danach, Ankunft davor) |
-| Andere Züge | Ausblenden oder grau darstellen |
+| Zielbahnhof | Optional: Abfahrt nur Züge dorthin, Ankunft nur Züge von dort; „(alle Züge)“ zeigt alle |
 | Züge | Gattungen: Fernverkehr, Regionalverkehr, S-Bahn, Bus, Tram, Sonstige |
 | Erweiterte Hinweise | Auch Hinweise wie „Ein Wagen fehlt“, „Hohe Auslastung“ oder „Heute nur einteilig“, Standard aus |
 | Zeilen auf der Tafel | 1 bis 20, Standard 10 |

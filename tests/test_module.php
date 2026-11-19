@@ -140,14 +140,10 @@ $tests['Module: recalc drops departed trains without requests'] = function () {
 };
 
 $tests['Module: walk time and route from the properties'] = function () {
-    $m = makeBoard(['WalkMinutes' => 20, 'RouteStation' => 'Großstadt Hbf', 'OffRoute' => 1]);
-    $rows = $m->testPayload()['rows'];
-    $byLine = array_column($rows, null, 'id');
-    check($byLine['-7005-2611041826-5']['offRoute'] === true, 'S2 to Nordstadt grey');
+    $m = makeBoard(['WalkMinutes' => 20, 'RouteStation' => 'Großstadt Hbf']);
+    $byLine = array_column($m->testPayload()['rows'], null, 'id');
+    check(!isset($byLine['-7005-2611041826-5']), 'S2 to Nordstadt hidden');
     check($byLine['-7008-2611041854-3']['reach'] === 'ok', 'RE6 via Großstadt reachable');
-    check($byLine['-7001-2611041801-4']['reach'] === 'missed', 'RE3 18:01 missed');
-    $m = makeBoard(['RouteStation' => 'Großstadt Hbf', 'OffRoute' => 0]);
-    check(!in_array('-7005-2611041826-5', array_column($m->testPayload()['rows'], 'id'), true), 'hidden');
 };
 
 $tests['Module: station search fills the station list'] = function () {
@@ -344,16 +340,16 @@ function formPanels(array $form): array
 
 $tests['Form: four panels, station and direction open'] = function () {
     $panels = formPanels(json_decode(file_get_contents(__DIR__ . '/../Bahntafel/form.json'), true));
-    check(array_keys($panels) === ['DB API access', 'Home station and direction', 'Display', 'Reachability (departures only)'], json_encode(array_keys($panels)));
-    check(($panels['Home station and direction']['expanded'] ?? false) === true, 'station panel open');
+    check(array_keys($panels) === ['DB API access', 'Home and destination station', 'Display', 'Reachability (departures only)'], json_encode(array_keys($panels)));
+    check(($panels['Home and destination station']['expanded'] ?? false) === true, 'station panel open');
     $names = fn (string $panel) => array_values(array_filter(array_map(fn ($e) => $e['name'] ?? '', formFields($panels[$panel]['items']))));
     check($names('DB API access') === ['ClientId', 'ApiKey', 'IntervalMinutes'], json_encode($names('DB API access')));
-    check($names('Home station and direction') === ['StationSearch', 'Station', 'RouteStation', 'OffRoute'], json_encode($names('Home station and direction')));
-    $fields = formFields($panels['Home station and direction']['items']);
+    check($names('Home and destination station') === ['StationSearch', 'Station', 'RouteStation'], json_encode($names('Home and destination station')));
+    $fields = formFields($panels['Home and destination station']['items']);
     $station = array_values(array_filter($fields, fn ($e) => ($e['name'] ?? '') === 'Station'))[0];
     check($station['caption'] === 'Home station' && str_contains($station['onChange'], "'StationChanged', \$Station"), 'home station reports changes');
     $route = array_values(array_filter($fields, fn ($e) => ($e['name'] ?? '') === 'RouteStation'))[0];
-    check($route['caption'] === 'Direction (train stops at)', $route['caption']);
+    check($route['caption'] === 'Destination station', $route['caption']);
     $search = array_values(array_filter($fields, fn ($e) => $e['type'] === 'Button'))[0];
     check(str_contains($search['onClick'], "'SearchStation', \$StationSearch"), 'search button');
 };
@@ -363,4 +359,8 @@ $tests['Module: access panel open while credentials are missing'] = function () 
     check($open(['ApiKey' => '']) === true, 'missing key');
     TestRegistry::reset();
     check($open([]) === false, 'configured');
+};
+
+$tests['Module: destination list starts with all trains'] = function () {
+    check(formElement(makeBoard(), 'RouteStation')['options'][0] === ['caption' => '(all trains)', 'value' => ''], 'first entry');
 };

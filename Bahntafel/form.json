@@ -11,7 +11,7 @@
             ]
         },
         {
-            "type": "ExpansionPanel", "caption": "Home station and direction", "expanded": true,
+            "type": "ExpansionPanel", "caption": "Home and destination station", "expanded": true,
             "items": [
                 { "type": "Label", "caption": "Enter a name or EVA number and search, then check the home station and apply" },
                 {
@@ -22,15 +22,8 @@
                     ]
                 },
                 { "type": "Select", "name": "Station", "caption": "Home station", "width": "400px", "options": [], "onChange": "IPS_RequestAction($id, 'StationChanged', $Station);" },
-                { "type": "Label", "caption": "Optional: only trains that also stop at this station, on departures after, on arrivals before the home station" },
-                { "type": "Select", "name": "RouteStation", "caption": "Direction (train stops at)", "width": "400px", "options": [] },
-                {
-                    "type": "Select", "name": "OffRoute", "caption": "Other trains",
-                    "options": [
-                        { "caption": "Hide", "value": 0 },
-                        { "caption": "Show grey", "value": 1 }
-                    ]
-                }
+                { "type": "Label", "caption": "Departures: only trains to this station. Arrivals: only trains from this station." },
+                { "type": "Select", "name": "RouteStation", "caption": "Destination station", "width": "400px", "options": [] }
             ]
         },
         {

@@ -3,9 +3,6 @@
         "de": {
             "Client ID": "Client-ID",
             "API key": "API-Key",
-            "Other trains": "Andere Züge",
-            "Hide": "ausblenden",
-            "Show grey": "grau darstellen",
             "Trains": "Züge",
             "Long distance (ICE, IC, EC)": "Fernverkehr (ICE, IC, EC)",
             "Regional (RE, RB)": "Regionalverkehr (RE, RB)",
@@ -39,12 +36,13 @@
             "The station search needs a subscription to the API OpenStation in the DB API Marketplace.": "Die Bahnhofssuche braucht ein Abo der API OpenStation im DB API Marketplace.",
             "Station name or EVA number": "Bahnhofsname oder EVA-Nummer",
             "DB API access": "Zugang zur DB API",
-            "Home station and direction": "Heimatbahnhof und Richtung",
             "Enter a name or EVA number and search, then check the home station and apply": "Namen oder EVA-Nummer eingeben und suchen, dann den Heimatbahnhof prüfen und übernehmen",
             "Home station": "Heimatbahnhof",
-            "Optional: only trains that also stop at this station, on departures after, on arrivals before the home station": "Optional: nur Züge, die auch an diesem Bahnhof halten – bei Abfahrt danach, bei Ankunft davor",
-            "Direction (train stops at)": "Richtung (Zug hält in)",
-            "Display": "Anzeige"
+            "Display": "Anzeige",
+            "Departures: only trains to this station. Arrivals: only trains from this station.": "Abfahrt: nur Züge nach diesem Bahnhof. Ankunft: nur Züge von diesem Bahnhof.",
+            "Destination station": "Zielbahnhof",
+            "(all trains)": "(alle Züge)",
+            "Home and destination station": "Heimat- und Zielbahnhof"
         }
     }
 }

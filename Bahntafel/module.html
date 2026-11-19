@@ -92,7 +92,7 @@
     }
 
     function rowOf(row) {
-        const r = el('div', 'row' + (row.cancelled || row.offRoute ? ' grey' : ''));
+        const r = el('div', 'row' + (row.cancelled ? ' grey' : ''));
         r.appendChild(badge(row.badge));
         r.appendChild(el('span', 'line', row.line));
         const dir = el('span', 'dir');

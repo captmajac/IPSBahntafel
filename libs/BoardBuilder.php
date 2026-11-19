@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 // Departure or arrival board from the trips of a BoardSource, for a given time; no API calls.
 // settings: board 'dep'|'arr', groups (TrainBadge groups to show), route (station name or ''),
-//           offRoute 'hide'|'grey', rows, walk (minutes, 0 = no reachability), tolerance (minutes),
+//           rows, walk (minutes, 0 = no reachability), tolerance (minutes),
 //           extended (bool, optional: also the extraMessages)
 class BoardBuilder
 {
@@ -21,8 +21,8 @@ class BoardBuilder
             if ($time < $now) {
                 continue;
             }
-            $offRoute = $settings['route'] !== '' && !self::onPath($settings['route'], $stop['path']);
-            if ($offRoute && $settings['offRoute'] === 'hide') {
+            // destination station: departures to it, arrivals from it
+            if ($settings['route'] !== '' && !self::onPath($settings['route'], $stop['path'])) {
                 continue;
             }
             $minutesLeft = intdiv($time - $now, 60);
@@ -49,8 +49,7 @@ class BoardBuilder
                 'continuesTo'     => $continuesTo === false ? '' : $continuesTo,
                 'minutesLeft'     => $minutesLeft,
                 // a delay may shrink, so the walk is planned for the earlier of planned and changed time
-                'reach'           => self::reach($part, $stop['cancelled'] || $offRoute, intdiv(min($time, $stop['planned']) - $now, 60), $settings),
-                'offRoute'        => $offRoute,
+                'reach'           => self::reach($part, $stop['cancelled'], intdiv(min($time, $stop['planned']) - $now, 60), $settings),
                 'messages'        => $messages,
             ];
         }
@@ -94,7 +93,7 @@ class BoardBuilder
     public static function nextTrain(array $rows): ?array
     {
         foreach ($rows as $row) {
-            if (!$row['cancelled'] && !$row['offRoute'] && $row['reach'] !== 'missed') {
+            if (!$row['cancelled'] && $row['reach'] !== 'missed') {
                 return $row;
             }
         }
