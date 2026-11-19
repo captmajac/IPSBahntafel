@@ -119,7 +119,7 @@ class Bahntafel extends IPSModule
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
         $options = [
             'Station'      => [$this->currentStationOption()],
-            'RouteStation' => $this->routeOptions(),
+            'RouteStation' => $this->routeOptions(json_decode($this->ReadAttributeString('Trips'), true)),
         ];
         $form['elements'] = self::withOptions($form['elements'], $options);
         return json_encode($form);
@@ -163,6 +163,9 @@ class Bahntafel extends IPSModule
                 } else {
                     $this->render();
                 }
+                break;
+            case 'StationChanged':
+                $this->showRouteStations((string) $Value);
                 break;
             case 'SearchStation':
                 $this->searchStation(trim((string) $Value));
@@ -345,7 +348,9 @@ class Bahntafel extends IPSModule
         }
         $this->UpdateFormField('Station', 'options', json_encode($options));
         // the first hit is selected, "Apply" saves it
-        $this->UpdateFormField('Station', 'value', self::option($stations[0]['name'], json_encode(['eva' => $stations[0]['eva'], 'name' => $stations[0]['name']]))['value']);
+        $first = self::option($stations[0]['name'], json_encode(['eva' => $stations[0]['eva'], 'name' => $stations[0]['name']]))['value'];
+        $this->UpdateFormField('Station', 'value', $first);
+        $this->showRouteStations($first);
     }
 
     private function currentStationOption(): array
@@ -355,9 +360,25 @@ class Bahntafel extends IPSModule
     }
 
     // stations on the paths of the loaded trips, departures and arrivals together; no API call
-    private function routeOptions(): array
+    // route list for the station chosen in the form, before it is saved; the saved trips stay
+    private function showRouteStations(string $station): void
     {
-        $trips = json_decode($this->ReadAttributeString('Trips'), true);
+        $eva = json_decode($station, true)['eva'] ?? '';
+        try {
+            $trips = $eva === '' ? [] : $this->client()->fetchTrips($eva, $this->now())['trips'];
+        } catch (ApiException $e) {
+            $this->message($this->errorText($e));
+            return;
+        }
+        $options = $this->routeOptions($trips);
+        if ($eva === '') {
+            $options = array_slice($options, 0, 1);
+        }
+        $this->UpdateFormField('RouteStation', 'options', json_encode($options));
+    }
+
+    private function routeOptions(array $trips): array
+    {
         $names = array_unique(array_merge(BoardBuilder::routeStations($trips, 'dep'), BoardBuilder::routeStations($trips, 'arr')));
         // the saved value stays selectable, e.g. in the spelling of the other data source
         $route = $this->ReadPropertyString('RouteStation');

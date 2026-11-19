@@ -49,7 +49,7 @@ function formStrings($node): array
     $out = [];
     if (is_array($node)) {
         foreach ($node as $key => $value) {
-            if (in_array($key, ['caption', 'label'], true) && is_string($value) && $value !== '') {
+            if (in_array($key, ['caption', 'label'], true) && is_string($value) && preg_match('/\\p{L}/u', $value) === 1) {
                 $out[] = $value;
             }
             $out = array_merge($out, formStrings($value));

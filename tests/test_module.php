@@ -319,3 +319,35 @@ $tests['Module: applying reloads the form, so the route list shows the new train
     $m = makeBoard();
     check($m->formReloads > 0, 'reloaded after apply');
 };
+
+$tests['Form: interval below the API key, separators after the API key and the direction'] = function () {
+    $form = json_decode(file_get_contents(__DIR__ . '/../Bahntafel/form.json'), true);
+    $at = fn (int $i) => $form['elements'][$i]['name'] ?? $form['elements'][$i]['type'];
+    $i = array_search('ApiKey', array_map(fn ($e) => $e['name'] ?? '', $form['elements']), true);
+    check($at($i + 1) === 'IntervalMinutes', 'interval below the API key');
+    $line = fn (int $i) => $form['elements'][$i]['type'] === 'Label' && preg_match('/^─+$/u', $form['elements'][$i]['caption']) === 1;
+    check($line($i + 2), 'line after the interval');
+    $o = array_search('OffRoute', array_map(fn ($e) => $e['name'] ?? '', $form['elements']), true);
+    check($at($o - 1) === 'RouteStation' && $line($o + 1), 'line after the direction');
+    check(str_contains($form['elements'][array_search('Station', array_map(fn ($e) => $e['name'] ?? '', $form['elements']), true)]['onChange'], "'StationChanged', \$Station"), 'station change reported');
+};
+
+$tests['Module: choosing a station fills the route list at once'] = function () {
+    $m = makeBoard(['Station' => '']);
+    $m->RequestAction('StationChanged', WOHNORT);
+    $names = array_column(lastFormUpdate($m, 'RouteStation'), 'value');
+    check($names[0] === '' && in_array('Großstadt Hbf', $names, true) && in_array('Messestadt Hbf', $names, true), json_encode($names));
+    check($m->attributes['Trips'] === '[]', 'saved trips untouched');
+};
+
+$tests['Module: search fills the route list of the first hit'] = function () {
+    $m = makeBoard(['Station' => '']);
+    $m->RequestAction('SearchStation', 'WohnortBahnhof');
+    check(in_array('Großstadt Hbf', array_column(lastFormUpdate($m, 'RouteStation'), 'value'), true), 'route list');
+};
+
+$tests['Module: choosing no station empties the route list'] = function () {
+    $m = makeBoard();
+    $m->RequestAction('StationChanged', '');
+    check(array_column(lastFormUpdate($m, 'RouteStation'), 'value') === [''], 'only none');
+};

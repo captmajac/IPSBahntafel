@@ -3,6 +3,8 @@
         { "type": "Label", "caption": "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\")" },
         { "type": "ValidationTextBox", "name": "ClientId", "caption": "Client ID", "width": "400px" },
         { "type": "PasswordTextBox", "name": "ApiKey", "caption": "API key", "width": "400px" },
+        { "type": "NumberSpinner", "name": "IntervalMinutes", "caption": "Update interval", "suffix": "min", "minimum": 15, "maximum": 240 },
+        { "type": "Label", "caption": "────────────────────────────────────────" },
         { "type": "Label", "caption": "Home station: enter a name or EVA number, search, then check the station below and apply" },
         {
             "type": "RowLayout",
@@ -11,7 +13,7 @@
                 { "type": "Button", "caption": "Search", "onClick": "IPS_RequestAction($id, 'SearchStation', $StationSearch);" }
             ]
         },
-        { "type": "Select", "name": "Station", "caption": "Station", "width": "400px", "options": [] },
+        { "type": "Select", "name": "Station", "caption": "Station", "width": "400px", "options": [], "onChange": "IPS_RequestAction($id, 'StationChanged', $Station);" },
         { "type": "Label", "caption": "Direction (optional): only trains that stop at this station, on departures after, on arrivals before the home station; the list contains the stations of the loaded trains" },
         { "type": "Select", "name": "RouteStation", "caption": "Via station", "width": "400px", "options": [] },
         {
@@ -21,6 +23,7 @@
                 { "caption": "Show grey", "value": 1 }
             ]
         },
+        { "type": "Label", "caption": "────────────────────────────────────────" },
         { "type": "Label", "caption": "Trains" },
         { "type": "CheckBox", "name": "ShowLong", "caption": "Long distance (ICE, IC, EC)" },
         { "type": "CheckBox", "name": "ShowRegional", "caption": "Regional (RE, RB)" },
@@ -37,8 +40,7 @@
                 { "type": "NumberSpinner", "name": "WalkMinutes", "caption": "Walking time to the station, relaxed (0 = off)", "suffix": "min", "minimum": 0, "maximum": 120 },
                 { "type": "NumberSpinner", "name": "ToleranceMinutes", "caption": "Of that, saved by hurrying (\"tight\")", "suffix": "min", "minimum": 0, "maximum": 30 }
             ]
-        },
-        { "type": "NumberSpinner", "name": "IntervalMinutes", "caption": "Update interval", "suffix": "min", "minimum": 15, "maximum": 240 }
+        }
     ],
     "actions": [
         { "type": "Button", "caption": "Test connection", "onClick": "IPS_RequestAction($id, 'TestConnection', '');" },

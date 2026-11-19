@@ -48,7 +48,7 @@ Unter *Instanz hinzufügen* die Instanz *Bahntafel* auswählen. Für mehrere Bah
 
 1. Client-ID und API-Key eintragen.
 2. Bei „Bahnhofsname oder EVA-Nummer“ den Namen (z. B. `WohnortBahnhof`) oder die 7-stellige EVA-Nummer eingeben und „Suchen“ klicken. Der erste Treffer steht dann direkt darunter unter „Bahnhof“. Passt er nicht, dort einen anderen Treffer wählen. Dann übernehmen.
-3. Optional die Richtung festlegen: unter „Über Bahnhof“ z. B. `Großstadt Hbf` wählen. Die Liste enthält die Bahnhöfe der zuletzt geladenen Züge, sie ist also erst nach dem ersten Abruf gefüllt. Bei „Andere Züge“ entscheidest du, ob Züge, die nicht an diesem Bahnhof halten, ausgeblendet oder grau dargestellt werden. Ausgeblendete Züge verkürzen die Tafel nicht, das Modul lädt dann weitere Stunden.
+3. Optional die Richtung festlegen: unter „Über Bahnhof“ z. B. `Großstadt Hbf` wählen. Die Liste füllt sich, sobald oben ein Bahnhof gewählt ist, mit den Bahnhöfen seiner Züge in den nächsten ein bis zwei Stunden. Speichern ist dafür nicht nötig. Bei „Andere Züge“ entscheidest du, ob Züge, die nicht an diesem Bahnhof halten, ausgeblendet oder grau dargestellt werden. Ausgeblendete Züge verkürzen die Tafel nicht, das Modul lädt dann weitere Stunden.
    - Abfahrt: Züge, die danach an dem Bahnhof halten.
    - Ankunft: Züge, die vorher an dem Bahnhof gehalten haben. Die Tafel zeigt dann, woher der Zug kommt und wohin er weiterfährt.
 4. Optional die Wegezeit von zu Hause zum Bahnhof eintragen, und zwar entspannt gegangen, dazu wie viele Minuten man mit zügigem Gehen spart. Die Abfahrtstafel zeigt dann *erreichbar* (entspannt), *knapp* (nur zügig) oder *nicht erreichbar*.
