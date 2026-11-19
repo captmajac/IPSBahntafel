@@ -1,6 +1,6 @@
 # Bahntafel: Umstellung von Timetables auf OpenBoards
 
-Stand: 2026-11-19 · Status: Entwurf zur Freigabe, noch kein Code
+Stand: 2026-11-19 · Status: umgesetzt, Ansatz B (reiner OpenBoards-Betrieb)
 
 ## Anlass
 
@@ -11,7 +11,7 @@ Die DB ersetzt die Timetables API durch die OpenBoards API.
 - Voraussichtlich Mitte 2027: Timetables wird abgeschaltet.
 - Neue Abos für Timetables gibt es schon jetzt nicht mehr. Timetables steht nicht mehr im Produktkatalog des Marketplace. Wer das Modul neu einrichtet, kann nur noch OpenBoards abonnieren.
 
-**Ziel:** Die Bahntafel läuft mit OpenBoards genauso wie heute: Abfahrt und Ankunft, Echtzeit, Gleiswechsel, Ausfälle, Hinweise, Richtungsfilter, Erreichbarkeit. Bestandsnutzer behalten bis zur Abschaltung eine funktionierende Tafel, auch wenn sie OpenBoards noch nicht abonniert haben. Neunutzer richten das Modul ohne Timetables ein.
+**Ziel:** Die Bahntafel läuft nur noch mit OpenBoards und kann dasselbe wie bisher: Abfahrt und Ankunft, Echtzeit, Gleiswechsel, Ausfälle, Hinweise, Richtungsfilter, Erreichbarkeit.
 
 ## Quellen
 
@@ -99,15 +99,13 @@ Erst OpenBoards versuchen, bei 401/403 Timetables.
 - \+ Kein Schalter.
 - − Doppelte Aufrufe und unklarer Zustand („welche API lief gerade?“). Ab Mitte 2027 scheitert der Fallback still. Die Fehlerbilder werden schwer verständlich.
 
-**Empfehlung: A.** Der Parallelbetrieb ist genau dafür da. Ein sichtbarer Schalter mit klarem Status ist für Bestandsnutzer verständlicher als Automatik. Der Aufwand gegenüber B ist klein, weil beide Clients dieselbe Schnittstelle bedienen.
+Empfohlen hatte ich A. **Entscheidung des Users (2026-11-19): B.** Außer dem User selbst hat noch niemand das Modul mit Timetables genutzt, und OpenBoards ist schon erreichbar. Darum gibt es keine Datenquellen-Auswahl, keinen Bestandsschutz und keinen Abschnitt zum Umstieg. `TimetablesClient`, `MessageCodes.php`, die Timetables-Fixtures und `capture-fixtures.php` entfallen. Der normalisierte Namensvergleich für den „Über Bahnhof“ bleibt, damit eine in Timetables-Schreibweise gespeicherte Richtung weiter greift.
 
-## Design (Ansatz A)
+## Design (Ansatz B)
 
 ### Schnittstelle und Fehler
 
-- `libs/BoardSource.php`: `interface BoardSource { searchStations(string $pattern): array; fetchTrips(string $eva, int $now, int $ahead = 1): array; }`. Das Rückgabeformat bleibt wie heute dokumentiert: `['trips' => Trip[], 'realtime' => bool]`.
-- Die Ausnahmen werden neutral: `ApiException` und `ApiAuthException` in `libs/BoardSource.php`. Sie ersetzen `TimetablesException` und `TimetablesAuthException` überall im Repo. Beide Clients werfen sie, das Modul fängt nur sie.
-- `TimetablesClient implements BoardSource` bleibt unverändert.
+- `libs/BoardSource.php`: `ApiException`, `ApiAuthException`, die Beschreibung des Trip-Formats und das Interface `BoardSource` (`searchStations`, `stationByEva`, `fetchTrips`), das `OpenBoardsClient` erfüllt. Das Interface bleibt als Naht für Tests und eine spätere zweite Quelle.
 
 ### OpenBoardsClient (`libs/OpenBoardsClient.php`)
 
@@ -123,7 +121,7 @@ Erst OpenBoards versuchen, bei 401/403 Timetables.
   - `messages`: Hinweise zu Verspätung, Ausfall und Störung des Zugs, also `risCauseCodes` außer Code `00` und `disruptions` (kurzer Text). Sie erscheinen immer.
   - `extraMessages`: `risQualityDeviations` (z. B. „Ein Wagen fehlt“, „Hohe Auslastung“) und `notes` mit `code` (z. B. „Heute nur einteilig“, „Ohne Halt zwischen …“). Sie erscheinen nur mit „Erweiterte Hinweise“.
   - Immer weg bleiben `notes` mit `disruptionID` (Infrastruktur wie Aufzüge) und `attributes`.
-  - `TimetablesClient` liefert `extraMessages` leer, weil Qualitätsmeldungen dort nur als Code ohne Text kommen. Doppelte Texte fallen raus. „Verspätung“ ohne Grund ergänzt weiter `BoardBuilder`.
+ Doppelte Texte fallen raus. „Verspätung“ ohne Grund ergänzt weiter `BoardBuilder`.
 - `realtime` ist immer `true`, weil Soll und Echtzeit aus derselben Antwort kommen. Scheitert der Aufruf, gibt es eine `ApiException`. 401/403 ergeben eine `ApiAuthException`. Antwortet 404 bei beiden Tafeln, gibt es eine `ApiException` „keine Tafel für Station“ wie heute.
 - `searchStations($pattern)`: `GET open-station/v1/netex?stopPlaceName=…&limit=20`. Aus dem NeTEx-XML kommen `StopPlace` → `Name` und `KeyValue` `EVA`. Treffer ohne EVA werden übersprungen. Fehlt das OpenStation-Abo (401/403), meldet das Modul: „Die Bahnhofssuche braucht das Abo OpenStation. Alternativ die EVA-Nummer eintragen.“ Die Tafel selbst funktioniert trotzdem.
 - `stationByEva($eva)`: Ersatz für die Suche ohne OpenStation-Abo. Ein `POST /departures` für die EVA, der Name kommt aus `stopPlaces`. Gibt `['eva', 'name']` zurück oder `null`, wenn die EVA unbekannt ist.
@@ -131,33 +129,24 @@ Erst OpenBoards versuchen, bei 401/403 Timetables.
 
 ### Modul
 
-- Neue Eigenschaft `Api`: 0 = Standard, 1 = OpenBoards, 2 = Timetables. Im Formular steht sie ganz oben als Auswahl „Datenquelle“ mit dem Hinweis auf die Abschaltung Mitte 2027. Die Option 0 zeigt, was der Standard dieser Instanz ist, z. B. „Standard (Timetables)“.
-- **Bestandsschutz ohne Selbstkonfiguration:** Das Modul darf seine Eigenschaften nicht selbst setzen (Konventions-Test gegen `IPS_SetProperty`). Darum entscheidet ein Attribut `DefaultApi`, was „Standard“ bedeutet. `ApplyChanges` setzt es einmalig, solange es leer ist: `timetables`, wenn die Instanz schon Daten geladen hat (`FetchedAt > 0`), sonst `openboards`. Das passiert vor dem Zurücksetzen der Trips. Neue Instanzen bekommen so OpenBoards, bestehende behalten Timetables, bis der Nutzer „OpenBoards“ wählt.
-- `client(): BoardSource` liefert je nach `Api` den passenden Client.
-- **Bahnhofswahl:** Die Suche bleibt wie heute (Feld „Bahnhof suchen“ und Auswahl). Darunter kommt ein Feld „EVA-Nummer“ mit der Schaltfläche „Übernehmen“. Sie ruft bei OpenBoards `stationByEva` auf und trägt Name und EVA als Auswahl ein, wie ein Suchtreffer. Die README empfiehlt, OpenStation zusammen mit OpenBoards zu abonnieren. Die EVA-Eingabe ist nur der Ausweg ohne dieses Abo.
+- `client()` liefert immer einen `OpenBoardsClient`. Für Tests liefert die geschützte Methode `http()` das HTTP-Callable, im Betrieb `null` (curl).
+- **Bahnhofswahl:** Die Suche läuft über OpenStation (Feld „Bahnhof suchen“ und Auswahl). Darunter kommt ein Feld „EVA-Nummer“ mit der Schaltfläche „EVA-Nummer übernehmen“. Sie ruft `stationByEva` auf und trägt Name und EVA als Auswahl ein, wie ein Suchtreffer. Ohne OpenStation-Abo meldet die Suche, dass das Abo fehlt, und verweist auf die EVA-Eingabe.
 - Neue Eigenschaft `ExtendedMessages` (Checkbox „Erweiterte Hinweise“, Standard aus). `BoardBuilder` hängt mit `settings['extended']` die `extraMessages` an die `messages` der Zeile an.
-- „Verbindung testen“ ruft bei OpenBoards eine Abfahrtstafel ab, weil das das Abo ist, auf das es ankommt. Bei Timetables bleibt es wie heute.
-- **Richtungsfilter:** `BoardBuilder` vergleicht den „Über Bahnhof“ mit den Halten des Laufwegs normalisiert: Kleinbuchstaben, ohne Leerzeichen und Satzzeichen. `Frankfurt(Main)Hbf` passt dann auf `Frankfurt (Main) Hbf`. Ein gespeicherter Wert überlebt den Wechsel der Datenquelle, ohne dass der Nutzer neu wählt.
-- Nach einem Wechsel der Datenquelle verwirft das Modul die geladenen Trips und lädt neu.
-- Gruppen: `TrainBadge::group` bekommt optional `type` aus OpenBoards, das bei OpenBoards Vorrang vor den Mustern hat (`HIGH_SPEED_TRAIN`/`INTERCITY_TRAIN` → lang, `REGIONAL_TRAIN`/`INTER_REGIONAL_TRAIN` → regional, `CITY_TRAIN` → S-Bahn). Ohne `type` gelten die bisherigen Muster. Dafür bekommt der Trip ein zusätzliches Feld `type` (bei Timetables `''`).
+- „Verbindung testen“ ruft `stationByEva` für den gewählten Bahnhof auf und meldet seinen Namen.
+- **Richtungsfilter:** `BoardBuilder` vergleicht den „Über Bahnhof“ mit den Halten des Laufwegs normalisiert: Kleinbuchstaben, ohne Leerzeichen und Satzzeichen. `Frankfurt(Main)Hbf` passt dann auf `Frankfurt (Main) Hbf`. „Bahnhöfe laden“ behält den gespeicherten Wert in der Liste.
+- Gruppen: `TrainBadge::group` bekommt `type` aus OpenBoards, das Vorrang vor den Mustern hat (`HIGH_SPEED_TRAIN`/`INTERCITY_TRAIN` → lang, `REGIONAL_TRAIN`/`INTER_REGIONAL_TRAIN` → regional, `CITY_TRAIN` → S-Bahn). Dafür bekommt der Trip das Feld `type`.
 
 ### Doku
 
-- README und Modul-README: OpenBoards abonnieren, für die Bahnhofssuche zusätzlich OpenStation. Hinweis auf den Parallelbetrieb und auf das Umschalten für Bestandsnutzer. Die Abrufzahl wird angepasst (2 statt 4 Aufrufe).
+- README und Modul-README: OpenBoards abonnieren, für die Bahnhofssuche zusätzlich OpenStation. Die Abrufzahl wird angepasst (2 Aufrufe pro Abruf).
 - `locale.json`: neue Texte.
 
 ### Tests (TDD, `../tools/php/php tests/run.php`)
 
-- Synthetische JSON-Fixtures für den fiktiven „WohnortBahnhof“ (EVA 8099001): `ob_departures_wohnort.json` und `ob_arrivals_wohnort.json` mit Verspätung, Gleiswechsel, Ausfall, Fahrtausfall, Meldungen aller Arten und einem Zug ohne Linie. Dazu `openstation_wohnort.xml`. Echte Antworten nur nach `tests/fixtures/raw/`.
-- `test_openboards.php`: Zuordnung zum Trip-Format, Zusammenführen über `journeyId`, Laufweg-Reihenfolge, Meldungen, Zeitfenster und Body der Anfrage, Fehlerfälle 401/403/404/5xx, Bahnhofssuche.
-- Ein gemeinsamer Vertragstest: Beide Clients liefern für gleichwertige Fixtures gleiche Board-Zeilen aus `BoardBuilder`.
-- `test_module.php`: Umschalter, Bestandsschutz, Verwerfen der Trips beim Wechsel.
+- Synthetische JSON-Fixtures für den fiktiven „WohnortBahnhof“ (EVA 8099001): `ob_departures_wohnort.json` und `ob_arrivals_wohnort.json` mit denselben Zügen, Zeiten und IDs wie die früheren Timetables-Fixtures, damit die Modul-Tests ihre Erwartungen behalten. Dazu `openstation_wohnort.xml`. Sonderfälle (fehlende Felder, unbekannte Herkunft) stehen als kleines JSON direkt im Test. Echte Antworten nur außerhalb des Repos.
+- `test_openboards.php`: Zuordnung zum Trip-Format, Zusammenführen über `journeyId`, Laufweg, Meldungen, Zeitfenster und Body der Anfrage, Fehlerfälle 401/403/404/5xx, Bahnhofssuche, EVA.
+- `test_module.php`: Abruf über OpenBoards, erweiterte Hinweise, EVA-Eingabe, Suche ohne OpenStation.
 - `test_board.php`: normalisierter Richtungsvergleich.
-- `capture-fixtures.php` bekommt einen OpenBoards-Modus (POST, Zugangsdaten nur aus der Umgebung).
-
-### Nach der Abschaltung (eigenes Release, Mitte 2027)
-
-`TimetablesClient`, `MessageCodes.php`, die Timetables-Fixtures und die Auswahl „Datenquelle“ entfallen. Die Eigenschaft `Api` bleibt registriert, damit gespeicherte Konfigurationen gültig bleiben, und wird ignoriert.
 
 ## Ergebnisse aus echten Antworten (2026-11-19)
 
@@ -166,7 +155,7 @@ Abfrage einer S-Bahn- und Regionalstation mit `tests/capture-openboards.php` als
 1. **Laufweg vollständig.** Mit `maxViaStops: 100` kommen alle Zwischenhalte, auch 18 bei einem langen RE. Mit dem Standard 3 kommt nur die Hälfte der Halte (177 gegen 93). Bei der Abfahrt enthält `via` die folgenden Halte, bei der Ankunft die vorherigen. Herkunft und Ziel sind nicht enthalten, sie kommen aus `journeyInfo`. Ein Zug ohne Zwischenhalt hat ein leeres `via`. Bei der Ankunft stehen die Halte ab dem Heimatbahnhof rückwärts. Das Design nutzt die Reihenfolge darum nicht: Herkunft und Ziel kommen aus `journeyInfo`, der Richtungsfilter prüft nur, ob der Halt enthalten ist.
 2. **`line.name`** ist kompakt wie bei Timetables (`S7`, `RE30`). **`category` ist der Betreiber-Code** (z. B. `SBH`, `ENO`, `WFB`), nicht die Gattung. Die Gruppe kommt darum aus `type`. Die bisherige Betreiber-Anzeige (`operator`, wenn die Linie nicht mit der Kategorie beginnt) funktioniert weiter. Einen ICE ohne Linie enthielt die Stichprobe nicht, der Rückfall `category journeyNumber` bleibt.
 3. **Zeitfenster filtert nach bester Zeit.** Ein Zug, geplant 22 Minuten vor Fensterbeginn und 6 Minuten danach erwartet, war im Fenster ab jetzt enthalten. Die Stunde Vorlauf für Verspätete entfällt, das Fenster beginnt bei `$now`.
-4. **Zugangsdaten:** Die bestehende Anwendung mit zusätzlichem OpenBoards-Abo funktioniert mit denselben Client-ID und API-Key. Bestandsnutzer müssen nur abonnieren und umschalten.
+4. **Zugangsdaten:** Die bestehende Anwendung mit zusätzlichem OpenBoards-Abo funktioniert mit denselben Client-ID und API-Key. 
 5. **OpenStation:** 401 ohne eigenes Abo. Format und Kosten prüfe ich, sobald es abonniert ist. Bis dahin beruht der Parser auf der Spezifikation und dem Beispiel im OpenAPI-Dokument.
 6. **Meldungen:** `attributes` (z. B. „Fahrradmitnahme begrenzt möglich“, „Rollstuhlstellplatz“) hängen an fast jedem Zug und bleiben weg. `risQualityDeviations` liefern nützliche Hinweise wie „Ein Wagen fehlt“ oder „Hohe Auslastung“. Es gibt zwei Arten von `notes`. Störungshinweise zur Infrastruktur haben `disruptionID` und `disruptionCommunicationID`, z. B. ein Aufzug außer Betrieb. Sie hingen an etwa der Hälfte der Züge. Zugbezogene Hinweise haben einen `code` (z. B. `1000`: „Heute nur einteilig“, „Ohne Halt zwischen …“). Die Reihenfolge der Via-Halte entspricht `displayPriority` (1, 2, 3 …).
 7. Abfahrt und Ankunft derselben Fahrt haben dieselbe `journeyId`. Das Zusammenführen funktioniert.

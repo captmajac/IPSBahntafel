@@ -10,6 +10,10 @@
 
 **Spec:** `docs/superpowers/specs/2026-11-19-openboards-migration-design.md`. Vor jeder Aufgabe lesen, besonders „OpenBoards in Kürze“, „Design“ und „Ergebnisse aus echten Antworten“.
 
+## Nachtrag 2026-11-19: nur noch OpenBoards
+
+Nach Task 6 hat der User entschieden, Timetables ganz zu streichen (Spec: Entscheidung B). Damit entfallen aus Task 1 `TimetablesClient`, aus Task 5 die Eigenschaft `Api`, das Attribut `DefaultApi`, der Bestandsschutz und die zugehörigen Tests, aus Task 6 der Abschnitt zum Umstieg. Die OpenBoards-Fixtures bilden die früheren Timetables-Fixtures nach (gleiche Züge, Zeiten und IDs), damit die Modul-Tests ihre Erwartungen behalten.
+
 ## Global Constraints
 
 - Tests: `../tools/php/php tests/run.php` aus dem Repo-Root (im Worktree: `/Users/MArC/Documents/Dev/claude/tools/php/php tests/run.php`). Alle Tests grün nach jeder Aufgabe. Der Runner macht Warnungen und Notices zu Fehlern.
