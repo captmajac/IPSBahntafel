@@ -122,6 +122,8 @@ class Bahntafel extends IPSModule
             'RouteStation' => $this->routeOptions(json_decode($this->ReadAttributeString('Trips'), true)),
         ];
         $form['elements'] = self::withOptions($form['elements'], $options);
+        // open the access panel until the credentials are entered
+        $form['elements'][0]['expanded'] = $this->ReadPropertyString('ClientId') === '' || $this->ReadPropertyString('ApiKey') === '';
         return json_encode($form);
     }
 

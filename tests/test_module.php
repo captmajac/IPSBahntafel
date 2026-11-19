@@ -4,7 +4,7 @@
 
 function formElement(IPSModule $m, string $name): array
 {
-    foreach (json_decode($m->GetConfigurationForm(), true)['elements'] as $element) {
+    foreach (formFields(json_decode($m->GetConfigurationForm(), true)['elements']) as $element) {
         if (($element['name'] ?? '') === $name) {
             return $element;
         }
@@ -208,7 +208,7 @@ $tests['Module: configuration form keeps the current station and route in the li
 $tests['Module: configuration form offers the current value of every list'] = function () {
     foreach ([[], ['Station' => '', 'RouteStation' => ''], ['ClientId' => '', 'ApiKey' => '', 'Station' => '']] as $props) {
         $m = makeBoard($props);
-        foreach (json_decode($m->GetConfigurationForm(), true)['elements'] as $element) {
+        foreach (formFields(json_decode($m->GetConfigurationForm(), true)['elements']) as $element) {
             if ($element['type'] === 'Select') {
                 $value = $m->properties[$element['name']];
                 check(in_array($value, array_column($element['options'], 'value'), true), $element['name'] . ' = ' . json_encode($value));
@@ -266,15 +266,6 @@ $tests['Module: test connection names the station'] = function () {
 };
 
 
-$tests['Form: station search right above the station, no EVA input, no load button'] = function () {
-    $form = json_decode(file_get_contents(__DIR__ . '/../Bahntafel/form.json'), true);
-    $names = array_map(fn ($e) => $e['name'] ?? '', $form['elements']);
-    $row = array_values(array_filter($form['elements'], fn ($e) => $e['type'] === 'RowLayout' && in_array('StationSearch', array_column($e['items'], 'name'), true)));
-    check(count($row) === 1 && str_contains($row[0]['items'][1]['onClick'], '\'SearchStation\', $StationSearch'), 'search field and button in one row');
-    check(array_search($row[0], $form['elements'], true) === array_search('Station', $names, true) - 1, 'right above the station');
-    $actions = json_encode($form['actions']);
-    check(!str_contains($actions, 'Eva') && !str_contains($actions, 'LoadStations') && !str_contains($actions, 'SearchStation'), $actions);
-};
 
 $tests['Module: station search selects the first station'] = function () {
     $m = makeBoard(['Station' => '']);
@@ -320,17 +311,6 @@ $tests['Module: applying reloads the form, so the route list shows the new train
     check($m->formReloads > 0, 'reloaded after apply');
 };
 
-$tests['Form: interval below the API key, separators after the API key and the direction'] = function () {
-    $form = json_decode(file_get_contents(__DIR__ . '/../Bahntafel/form.json'), true);
-    $at = fn (int $i) => $form['elements'][$i]['name'] ?? $form['elements'][$i]['type'];
-    $i = array_search('ApiKey', array_map(fn ($e) => $e['name'] ?? '', $form['elements']), true);
-    check($at($i + 1) === 'IntervalMinutes', 'interval below the API key');
-    $line = fn (int $i) => $form['elements'][$i]['type'] === 'Label' && preg_match('/^─+$/u', $form['elements'][$i]['caption']) === 1;
-    check($line($i + 2), 'line after the interval');
-    $o = array_search('OffRoute', array_map(fn ($e) => $e['name'] ?? '', $form['elements']), true);
-    check($at($o - 1) === 'RouteStation' && $line($o + 1), 'line after the direction');
-    check(str_contains($form['elements'][array_search('Station', array_map(fn ($e) => $e['name'] ?? '', $form['elements']), true)]['onChange'], "'StationChanged', \$Station"), 'station change reported');
-};
 
 $tests['Module: choosing a station fills the route list at once'] = function () {
     $m = makeBoard(['Station' => '']);
@@ -350,4 +330,37 @@ $tests['Module: choosing no station empties the route list'] = function () {
     $m = makeBoard();
     $m->RequestAction('StationChanged', '');
     check(array_column(lastFormUpdate($m, 'RouteStation'), 'value') === [''], 'only none');
+};
+
+function formPanels(array $form): array
+{
+    $panels = [];
+    foreach ($form['elements'] as $element) {
+        check($element['type'] === 'ExpansionPanel', 'only panels at the top: ' . $element['type']);
+        $panels[$element['caption']] = $element;
+    }
+    return $panels;
+}
+
+$tests['Form: four panels, station and direction open'] = function () {
+    $panels = formPanels(json_decode(file_get_contents(__DIR__ . '/../Bahntafel/form.json'), true));
+    check(array_keys($panels) === ['DB API access', 'Home station and direction', 'Display', 'Reachability (departures only)'], json_encode(array_keys($panels)));
+    check(($panels['Home station and direction']['expanded'] ?? false) === true, 'station panel open');
+    $names = fn (string $panel) => array_values(array_filter(array_map(fn ($e) => $e['name'] ?? '', formFields($panels[$panel]['items']))));
+    check($names('DB API access') === ['ClientId', 'ApiKey', 'IntervalMinutes'], json_encode($names('DB API access')));
+    check($names('Home station and direction') === ['StationSearch', 'Station', 'RouteStation', 'OffRoute'], json_encode($names('Home station and direction')));
+    $fields = formFields($panels['Home station and direction']['items']);
+    $station = array_values(array_filter($fields, fn ($e) => ($e['name'] ?? '') === 'Station'))[0];
+    check($station['caption'] === 'Home station' && str_contains($station['onChange'], "'StationChanged', \$Station"), 'home station reports changes');
+    $route = array_values(array_filter($fields, fn ($e) => ($e['name'] ?? '') === 'RouteStation'))[0];
+    check($route['caption'] === 'Direction (train stops at)', $route['caption']);
+    $search = array_values(array_filter($fields, fn ($e) => $e['type'] === 'Button'))[0];
+    check(str_contains($search['onClick'], "'SearchStation', \$StationSearch"), 'search button');
+};
+
+$tests['Module: access panel open while credentials are missing'] = function () {
+    $open = fn (array $props) => formPanels(json_decode(makeBoard($props)->GetConfigurationForm(), true))['DB API access']['expanded'] ?? false;
+    check($open(['ApiKey' => '']) === true, 'missing key');
+    TestRegistry::reset();
+    check($open([]) === false, 'configured');
 };

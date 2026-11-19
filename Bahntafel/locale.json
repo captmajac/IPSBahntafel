@@ -3,8 +3,6 @@
         "de": {
             "Client ID": "Client-ID",
             "API key": "API-Key",
-            "Station": "Bahnhof",
-            "Via station": "Über Bahnhof",
             "Other trains": "Andere Züge",
             "Hide": "ausblenden",
             "Show grey": "grau darstellen",
@@ -38,10 +36,15 @@
             "Departure": "Abfahrt",
             "Arrival": "Ankunft",
             "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\")": "Zugang zum DB API Marketplace (APIs „OpenBoards“ und „OpenStation“)",
-            "Direction (optional): only trains that stop at this station, on departures after, on arrivals before the home station; the list contains the stations of the loaded trains": "Richtung (optional): nur Züge, die an diesem Bahnhof halten – bei Abfahrt danach, bei Ankunft davor; die Liste enthält die Bahnhöfe der geladenen Züge",
             "The station search needs a subscription to the API OpenStation in the DB API Marketplace.": "Die Bahnhofssuche braucht ein Abo der API OpenStation im DB API Marketplace.",
             "Station name or EVA number": "Bahnhofsname oder EVA-Nummer",
-            "Home station: enter a name or EVA number, search, then check the station below and apply": "Heimatbahnhof: Namen oder EVA-Nummer eingeben, suchen, darunter den Bahnhof prüfen und übernehmen"
+            "DB API access": "Zugang zur DB API",
+            "Home station and direction": "Heimatbahnhof und Richtung",
+            "Enter a name or EVA number and search, then check the home station and apply": "Namen oder EVA-Nummer eingeben und suchen, dann den Heimatbahnhof prüfen und übernehmen",
+            "Home station": "Heimatbahnhof",
+            "Optional: only trains that also stop at this station, on departures after, on arrivals before the home station": "Optional: nur Züge, die auch an diesem Bahnhof halten – bei Abfahrt danach, bei Ankunft davor",
+            "Direction (train stops at)": "Richtung (Zug hält in)",
+            "Display": "Anzeige"
         }
     }
 }

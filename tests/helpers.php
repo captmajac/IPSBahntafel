@@ -104,3 +104,14 @@ function openBoardsHttp(): callable
 {
     return fakeHttp(openBoardsRoutes());
 }
+
+// all form fields, also those inside panels and rows, in form order
+function formFields(array $elements): array
+{
+    $out = [];
+    foreach ($elements as $element) {
+        $out[] = $element;
+        $out = array_merge($out, formFields($element['items'] ?? []));
+    }
+    return $out;
+}

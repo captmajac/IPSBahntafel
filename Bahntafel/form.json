@@ -1,49 +1,66 @@
 {
     "elements": [
-        { "type": "Label", "caption": "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\")" },
-        { "type": "ValidationTextBox", "name": "ClientId", "caption": "Client ID", "width": "400px" },
-        { "type": "PasswordTextBox", "name": "ApiKey", "caption": "API key", "width": "400px" },
-        { "type": "NumberSpinner", "name": "IntervalMinutes", "caption": "Update interval", "suffix": "min", "minimum": 15, "maximum": 240 },
-        { "type": "Label", "caption": "────────────────────────────────────────" },
-        { "type": "Label", "caption": "Home station: enter a name or EVA number, search, then check the station below and apply" },
         {
-            "type": "RowLayout",
+            "type": "ExpansionPanel", "caption": "DB API access",
             "items": [
-                { "type": "ValidationTextBox", "name": "StationSearch", "caption": "Station name or EVA number", "width": "300px" },
-                { "type": "Button", "caption": "Search", "onClick": "IPS_RequestAction($id, 'SearchStation', $StationSearch);" }
+                { "type": "Label", "caption": "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\")" },
+                { "type": "ValidationTextBox", "name": "ClientId", "caption": "Client ID", "width": "400px" },
+                { "type": "PasswordTextBox", "name": "ApiKey", "caption": "API key", "width": "400px" },
+                { "type": "NumberSpinner", "name": "IntervalMinutes", "caption": "Update interval", "suffix": "min", "minimum": 15, "maximum": 240 },
+                { "type": "Button", "caption": "Test connection", "onClick": "IPS_RequestAction($id, 'TestConnection', '');" }
             ]
         },
-        { "type": "Select", "name": "Station", "caption": "Station", "width": "400px", "options": [], "onChange": "IPS_RequestAction($id, 'StationChanged', $Station);" },
-        { "type": "Label", "caption": "Direction (optional): only trains that stop at this station, on departures after, on arrivals before the home station; the list contains the stations of the loaded trains" },
-        { "type": "Select", "name": "RouteStation", "caption": "Via station", "width": "400px", "options": [] },
         {
-            "type": "Select", "name": "OffRoute", "caption": "Other trains",
-            "options": [
-                { "caption": "Hide", "value": 0 },
-                { "caption": "Show grey", "value": 1 }
+            "type": "ExpansionPanel", "caption": "Home station and direction", "expanded": true,
+            "items": [
+                { "type": "Label", "caption": "Enter a name or EVA number and search, then check the home station and apply" },
+                {
+                    "type": "RowLayout",
+                    "items": [
+                        { "type": "ValidationTextBox", "name": "StationSearch", "caption": "Station name or EVA number", "width": "300px" },
+                        { "type": "Button", "caption": "Search", "onClick": "IPS_RequestAction($id, 'SearchStation', $StationSearch);" }
+                    ]
+                },
+                { "type": "Select", "name": "Station", "caption": "Home station", "width": "400px", "options": [], "onChange": "IPS_RequestAction($id, 'StationChanged', $Station);" },
+                { "type": "Label", "caption": "Optional: only trains that also stop at this station, on departures after, on arrivals before the home station" },
+                { "type": "Select", "name": "RouteStation", "caption": "Direction (train stops at)", "width": "400px", "options": [] },
+                {
+                    "type": "Select", "name": "OffRoute", "caption": "Other trains",
+                    "options": [
+                        { "caption": "Hide", "value": 0 },
+                        { "caption": "Show grey", "value": 1 }
+                    ]
+                }
             ]
         },
-        { "type": "Label", "caption": "────────────────────────────────────────" },
-        { "type": "Label", "caption": "Trains" },
-        { "type": "CheckBox", "name": "ShowLong", "caption": "Long distance (ICE, IC, EC)" },
-        { "type": "CheckBox", "name": "ShowRegional", "caption": "Regional (RE, RB)" },
-        { "type": "CheckBox", "name": "ShowSBahn", "caption": "S-Bahn" },
-        { "type": "CheckBox", "name": "ShowBus", "caption": "Bus" },
-        { "type": "CheckBox", "name": "ShowTram", "caption": "Tram" },
-        { "type": "CheckBox", "name": "ShowOther", "caption": "Other" },
-        { "type": "CheckBox", "name": "ExtendedMessages", "caption": "Extended notes (e.g. missing coach, high occupancy)" },
-        { "type": "NumberSpinner", "name": "Rows", "caption": "Rows on the board", "minimum": 1, "maximum": 20 },
-        { "type": "Label", "caption": "Reachability (departures only)" },
         {
-            "type": "RowLayout",
+            "type": "ExpansionPanel", "caption": "Display",
             "items": [
-                { "type": "NumberSpinner", "name": "WalkMinutes", "caption": "Walking time to the station, relaxed (0 = off)", "suffix": "min", "minimum": 0, "maximum": 120 },
-                { "type": "NumberSpinner", "name": "ToleranceMinutes", "caption": "Of that, saved by hurrying (\"tight\")", "suffix": "min", "minimum": 0, "maximum": 30 }
+                { "type": "Label", "caption": "Trains" },
+                { "type": "CheckBox", "name": "ShowLong", "caption": "Long distance (ICE, IC, EC)" },
+                { "type": "CheckBox", "name": "ShowRegional", "caption": "Regional (RE, RB)" },
+                { "type": "CheckBox", "name": "ShowSBahn", "caption": "S-Bahn" },
+                { "type": "CheckBox", "name": "ShowBus", "caption": "Bus" },
+                { "type": "CheckBox", "name": "ShowTram", "caption": "Tram" },
+                { "type": "CheckBox", "name": "ShowOther", "caption": "Other" },
+                { "type": "CheckBox", "name": "ExtendedMessages", "caption": "Extended notes (e.g. missing coach, high occupancy)" },
+                { "type": "NumberSpinner", "name": "Rows", "caption": "Rows on the board", "minimum": 1, "maximum": 20 }
+            ]
+        },
+        {
+            "type": "ExpansionPanel", "caption": "Reachability (departures only)",
+            "items": [
+                {
+                    "type": "RowLayout",
+                    "items": [
+                        { "type": "NumberSpinner", "name": "WalkMinutes", "caption": "Walking time to the station, relaxed (0 = off)", "suffix": "min", "minimum": 0, "maximum": 120 },
+                        { "type": "NumberSpinner", "name": "ToleranceMinutes", "caption": "Of that, saved by hurrying (\"tight\")", "suffix": "min", "minimum": 0, "maximum": 30 }
+                    ]
+                }
             ]
         }
     ],
     "actions": [
-        { "type": "Button", "caption": "Test connection", "onClick": "IPS_RequestAction($id, 'TestConnection', '');" },
         { "type": "Button", "caption": "Name instance after the station", "onClick": "IPS_RequestAction($id, 'NameInstance', '');" },
         { "type": "PopupAlert", "name": "Message", "visible": false, "popup": { "items": [{ "type": "Label", "name": "MessageText", "caption": "" }] } }
     ],
