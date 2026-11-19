@@ -67,3 +67,17 @@ function echoed(callable $action): string
     $action();
     return (string) ob_get_clean();
 }
+
+// WohnortBahnhof responses of the OpenBoards fixtures (04.11.2026 18 to 20 o'clock)
+function openBoardsRoutes(): array
+{
+    return [
+        '/open-boards/v1/departures' => [200, fixture('ob_departures_wohnort.json')],
+        '/open-boards/v1/arrivals'   => [200, fixture('ob_arrivals_wohnort.json')],
+    ];
+}
+
+function openBoardsHttp(): callable
+{
+    return fakeHttp(openBoardsRoutes());
+}

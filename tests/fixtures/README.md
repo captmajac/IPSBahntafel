@@ -22,3 +22,18 @@ Offen: ein Abruf über Mitternacht (Stunde 23 und 00) und die Namenssuche (`stat
 Bekannter Trip für Tests: `-7008-2611041854-3`, RE6 (NVB), Abfahrt 18:54 Gleis 1, Ziel Grenzstadt, über Großstadt Hbf.
 
 Meldungen: `t="d"` (Verspätungsgrund) und `t="h"` (HIM, Text in `cat`) werden angezeigt, `t="q"` (Qualität, z. B. WLAN) nicht. Mit echten Antworten prüfen, ob HIM-Meldungen weitere Textattribute haben.
+
+## OpenBoards (Stand 2026-11-19)
+
+Synthetische Antworten im Format von OpenBoards 1.0.3 für denselben „WohnortBahnhof“ und dieselben erfundenen Nachbarn (EVA 8099002 und folgende). Echte Antworten holt `tests/capture-openboards.php`, das als Skript in IP-Symcon läuft und die Zugangsdaten der Instanz nutzt. Es speichert im IP-Symcon-Verzeichnis unter `bahn-capture/`, nie im Repo.
+
+Ein Abgleich mit einer echten S-Bahn- und Regionalstation am 19.11.2026 ergab:
+- `via` enthält mit `maxViaStops: 100` alle Zwischenhalte, ohne Herkunft und Ziel. Bei der Ankunft stehen sie vom Bahnhof aus rückwärts, `displayPriority` zählt 1, 2, 3 ….
+- `line.name` ist kompakt (`S7`, `RE30`), `category` ist der Betreiber-Code.
+- Das Zeitfenster filtert nach bester Zeit: Verspätete Züge, die vor Fensterbeginn geplant waren, sind enthalten.
+- `attributes` hängen an fast jedem Zug, `notes` mit `disruptionID` (z. B. Aufzug außer Betrieb) an vielen. Zugbezogene `notes` haben einen `code`.
+
+| Datei | Inhalt |
+|---|---|
+| `ob_departures_wohnort.json` | RE7 18:06 fällt aus (Störung Bauarbeiten). S1 18:06 pünktlich (`REAL`). RE3 18:19 → 18:31, Gleis 2 → 3, Code 43, entspricht `-7004-2611041819-4` aus den Timetables-Fixtures. RE6 18:54 mit Qualitätshinweis, zugbezogener Notiz, Aufzug-Notiz, Attribut und Code 00. IC 2000 19:12 ohne Linie, Gleis, Via und Meldungen. |
+| `ob_arrivals_wohnort.json` | S1 18:05, RE3 18:18 → 18:30. RE7 19:20 endet hier, Fahrt fällt aus, Herkunft ohne Eintrag in `stopPlaces`. |
