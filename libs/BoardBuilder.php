@@ -84,7 +84,8 @@ class BoardBuilder
                 $stations[$station] = true;
             }
         }
-        $names = array_keys($stations);
+        // numeric names (an EVA number without a name) become int keys
+        $names = array_map('strval', array_keys($stations));
         sort($names, SORT_STRING | SORT_FLAG_CASE);
         return $names;
     }

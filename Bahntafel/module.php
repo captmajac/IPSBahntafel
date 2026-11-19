@@ -92,7 +92,9 @@ class Bahntafel extends IPSModule
 
         // before the trips are reset: an instance that has fetched before the update keeps Timetables
         if ($this->ReadAttributeString('DefaultApi') === '') {
-            $this->WriteAttributeString('DefaultApi', $this->ReadAttributeInteger('FetchedAt') > 0 ? 'timetables' : 'openboards');
+            // version 1.0 wrote TripsEva on every ApplyChanges with a station, a new instance has none yet
+            $legacy = $this->ReadAttributeInteger('FetchedAt') > 0 || $this->ReadAttributeString('TripsEva') !== '';
+            $this->WriteAttributeString('DefaultApi', $legacy ? 'timetables' : 'openboards');
         }
 
         $key = $this->api() . ':' . ($this->station()['eva'] ?? '');
@@ -397,6 +399,11 @@ class Bahntafel extends IPSModule
     {
         $trips = json_decode($this->ReadAttributeString('Trips'), true);
         $names = array_unique(array_merge(BoardBuilder::routeStations($trips, 'dep'), BoardBuilder::routeStations($trips, 'arr')));
+        // the saved value stays selectable, e.g. in the spelling of the other data source
+        $route = $this->ReadPropertyString('RouteStation');
+        if ($route !== '' && !in_array($route, $names, true)) {
+            $names[] = $route;
+        }
         sort($names, SORT_STRING | SORT_FLAG_CASE);
         $options = [self::option($this->Translate("(none)"), '')];
         foreach ($names as $name) {

@@ -337,3 +337,23 @@ $tests['Module: test connection names the station'] = function () {
         check(popup($m, fn () => $m->RequestAction('TestConnection', '')) === 'OK: WohnortBahnhof', "api $api");
     }
 };
+
+$tests['Module: existing instance without a successful fetch keeps Timetables'] = function () {
+    TestRegistry::$http = wohnortHttp();
+    $m = new TestBahntafel(2);
+    TestRegistry::$objects[2] ??= ['name' => 'Bahntafel', 'type' => 1];
+    // version 1.0 wrote TripsEva with the station on every ApplyChanges, FetchedAt stays 0 while fetching fails
+    $m->attributes = ['FetchedAt' => 0, 'TripsEva' => '8099001', 'Trips' => '[]'];
+    $m->Create();
+    $m->properties = array_merge($m->properties, ['ClientId' => 'id', 'ApiKey' => 'key', 'Station' => WOHNORT]);
+    $m->ApplyChanges();
+    check($m->attributes['DefaultApi'] === 'timetables', $m->attributes['DefaultApi']);
+};
+
+$tests['Module: loading the stations keeps the saved route station'] = function () {
+    $m = makeBoard(['Api' => 1, 'RouteStation' => 'Großstadt(Main)Hbf']);
+    $m->RequestAction('LoadStations', '');
+    $values = array_column(lastFormUpdate($m, 'RouteStation'), 'value');
+    check(in_array('Großstadt(Main)Hbf', $values, true) && in_array('Großstadt Hbf', $values, true), json_encode($values));
+    check(count($values) === count(array_unique($values)), 'no duplicates');
+};

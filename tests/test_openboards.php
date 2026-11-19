@@ -126,6 +126,12 @@ $tests['OpenStation: without subscription'] = function () {
 $tests['OpenBoards: station by eva'] = function () {
     $client = new OpenBoardsClient('id', 'key', openBoardsHttp());
     check($client->stationByEva('8099001', ts('2611041800')) === ['eva' => '8099001', 'name' => 'WohnortBahnhof'], 'found');
-    check(json_decode(TestRegistry::$calls[0][2], true)['timeWindow'] === ['timeStart' => '2026-11-04T18:00:00+01:00', 'timeEnd' => '2026-11-04T18:30:00+01:00'], 'window');
+    // the longest window the API allows: a quiet station may have no train in the next half hour
+    check(json_decode(TestRegistry::$calls[0][2], true)['timeWindow'] === ['timeStart' => '2026-11-04T18:00:00+01:00', 'timeEnd' => '2026-11-05T02:00:00+01:00'], 'window');
     check((new OpenBoardsClient('id', 'key', fakeHttp([])))->stationByEva('8099999') === null, 'unknown');
+};
+
+$tests['OpenBoards: station by eva from the arrivals when nothing departs'] = function () {
+    $client = new OpenBoardsClient('id', 'key', fakeHttp(['/arrivals' => [200, fixture('ob_arrivals_wohnort.json')]]));
+    check($client->stationByEva('8099001', ts('2611041800')) === ['eva' => '8099001', 'name' => 'WohnortBahnhof'], 'terminus');
 };

@@ -59,19 +59,19 @@ class OpenBoardsClient implements BoardSource
         return array_values($stations);
     }
 
-    // name from the stopPlaces of a short departure board; works without OpenStation
+    // name from the stopPlaces of a board; works without OpenStation. The longest window the API allows (8 h),
+    // arrivals too for a terminus: a quiet station may have no departure soon
     public function stationByEva(string $eva, ?int $now = null): ?array
     {
         $now ??= time();
         $tz = new DateTimeZone(self::TIMEZONE);
-        $window = ['timeStart' => (new DateTime('@' . $now))->setTimezone($tz)->format('c'), 'timeEnd' => (new DateTime('@' . ($now + 1800)))->setTimezone($tz)->format('c')];
-        $json = $this->board('departures', $eva, $window);
-        if ($json === null) {
-            return null;
-        }
-        foreach (self::decode($json)['stopPlaces'] ?? [] as $stopPlace) {
-            if (($stopPlace['evaNumber'] ?? '') === $eva) {
-                return ['eva' => $eva, 'name' => $stopPlace['localizedNames'][0]['name'] ?? $eva];
+        $window = ['timeStart' => (new DateTime('@' . $now))->setTimezone($tz)->format('c'), 'timeEnd' => (new DateTime('@' . ($now + 8 * 3600)))->setTimezone($tz)->format('c')];
+        foreach (['departures', 'arrivals'] as $endpoint) {
+            $json = $this->board($endpoint, $eva, $window);
+            foreach ($json === null ? [] : self::decode($json)['stopPlaces'] ?? [] as $stopPlace) {
+                if (($stopPlace['evaNumber'] ?? '') === $eva) {
+                    return ['eva' => $eva, 'name' => $stopPlace['localizedNames'][0]['name'] ?? $eva];
+                }
             }
         }
         return null;
