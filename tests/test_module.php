@@ -364,3 +364,10 @@ $tests['Module: access panel open while credentials are missing'] = function () 
 $tests['Module: destination list starts with all trains'] = function () {
     check(formElement(makeBoard(), 'RouteStation')['options'][0] === ['caption' => '(all trains)', 'value' => ''], 'first entry');
 };
+
+$tests['Form: naming the instance is a button in the display panel'] = function () {
+    $form = json_decode(file_get_contents(__DIR__ . '/../Bahntafel/form.json'), true);
+    $display = json_encode(formPanels($form)['Display']['items']);
+    check(str_contains($display, "'NameInstance'"), 'in the display panel');
+    check(!str_contains(json_encode($form['actions']), 'NameInstance'), 'not in the actions');
+};

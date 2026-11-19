@@ -54,7 +54,7 @@ Die Einstellungen sind in vier aufklappbare Bereiche gegliedert: *Zugang zur DB 
    - Abfahrt: Züge, die danach am Zielbahnhof halten, auch wenn sie weiterfahren.
    - Ankunft: Züge, die vorher am Zielbahnhof gehalten haben, auch wenn sie woanders gestartet sind. Die Tafel zeigt, woher der Zug kommt und wohin er weiterfährt.
 4. Optional unter *Erreichbarkeit* die Wegezeit von zu Hause zum Bahnhof eintragen, und zwar entspannt gegangen, dazu wie viele Minuten man mit zügigem Gehen spart. Die Abfahrtstafel zeigt dann *erreichbar* (entspannt), *knapp* (nur zügig) oder *nicht erreichbar*.
-5. Optional „Instanz nach Bahnhof benennen“: Die Instanz und damit die Kachel heißt dann wie der Bahnhof. Das Modul ändert Namen und Icons sonst nie selbst.
+5. Optional unter *Anzeige* „Instanz nach Bahnhof benennen“ klicken: Die Instanz und damit die Kachel heißt dann wie der Bahnhof. Das Modul ändert Namen und Icons sonst nie selbst.
 
 Unter der Instanz liegen:
 

@@ -39,10 +39,10 @@
             "Enter a name or EVA number and search, then check the home station and apply": "Namen oder EVA-Nummer eingeben und suchen, dann den Heimatbahnhof prüfen und übernehmen",
             "Home station": "Heimatbahnhof",
             "Display": "Anzeige",
-            "Departures: only trains to this station. Arrivals: only trains from this station.": "Abfahrt: nur Züge nach diesem Bahnhof. Ankunft: nur Züge von diesem Bahnhof.",
             "Destination station": "Zielbahnhof",
             "(all trains)": "(alle Züge)",
-            "Home and destination station": "Heimat- und Zielbahnhof"
+            "Home and destination station": "Heimat- und Zielbahnhof",
+            "A chosen station shows only trains to and from it. Otherwise choose \"(all trains)\".": "Ein gewählter Bahnhof zeigt nur Züge von und nach dort. Sonst „(alle Züge)“ wählen."
         }
     }
 }
