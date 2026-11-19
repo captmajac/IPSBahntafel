@@ -1,6 +1,7 @@
 <?php
 
 // Saves real DB Timetables API responses as test fixtures.
+// Timetables only; for OpenBoards see capture-openboards.php (runs as an IP-Symcon script).
 // Usage: DB_CLIENT_ID=... DB_API_KEY=... ../tools/php/php tests/capture-fixtures.php <eva>
 // The credentials are only read from the environment and never written to a file.
 
