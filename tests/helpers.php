@@ -10,8 +10,8 @@ function fixture(string $name): string
 // fake HTTP: path suffix => [status, body]; records the calls
 function fakeHttp(array $responses): callable
 {
-    return function (string $url, array $headers) use ($responses): array {
-        TestRegistry::$calls[] = [$url, $headers];
+    return function (string $url, array $headers, ?string $body = null) use ($responses): array {
+        TestRegistry::$calls[] = [$url, $headers, $body];
         foreach ($responses as $suffix => $response) {
             if (str_ends_with($url, $suffix)) {
                 return ['status' => $response[0], 'body' => $response[1]];

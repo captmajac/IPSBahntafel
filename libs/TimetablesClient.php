@@ -2,15 +2,11 @@
 
 declare(strict_types=1);
 
-class TimetablesException extends Exception {}
-
-class TimetablesAuthException extends TimetablesException {}
+require_once __DIR__ . '/BoardSource.php';
 
 // DB Timetables API: station search, planned timetable (plan) and changes (fchg) of one station.
-// Trip: ['id', 'line', 'category', 'number', 'dep' => ?Stop, 'arr' => ?Stop, 'messages' => string[]]
-// Stop: ['planned' => int, 'changed' => ?int, 'platform' => string, 'changedPlatform' => ?string,
-//        'path' => string[] (dep: following stations, arr: previous stations), 'cancelled' => bool]
-class TimetablesClient
+// Trip format see BoardSource; quality messages come only as codes, so extraMessages stays empty.
+class TimetablesClient implements BoardSource
 {
     const BASE_URL = 'https://apis.deutschebahn.com/db-api-marketplace/apis/timetables/v1/';
     const TIMEZONE = 'Europe/Berlin';
@@ -36,6 +32,16 @@ class TimetablesClient
         return $stations;
     }
 
+    public function stationByEva(string $eva): ?array
+    {
+        foreach ($this->searchStations($eva) as $station) {
+            if ($station['eva'] === $eva) {
+                return $station;
+            }
+        }
+        return null;
+    }
+
     // planned trips of the previous, current and next hour with the known changes; realtime false if fchg failed
     // plans from the previous hour up to $ahead hours after the current one, with the changes
     public function fetchTrips(string $eva, int $now, int $ahead = 1): array
@@ -57,13 +63,13 @@ class TimetablesClient
         }
         // a single empty hour is normal, none at all means a wrong station or an API problem
         if (!$found) {
-            throw new TimetablesException("DB API has no timetable for station $eva");
+            throw new ApiException("DB API has no timetable for station $eva");
         }
         try {
             $changes = self::parseChanges((string) $this->get("fchg/$eva"));
-        } catch (TimetablesAuthException $e) {
+        } catch (ApiAuthException $e) {
             throw $e;
-        } catch (TimetablesException $e) {
+        } catch (ApiException $e) {
             return ['trips' => $trips, 'realtime' => false];
         }
         return ['trips' => self::merge($trips, $changes), 'realtime' => true];
@@ -84,9 +90,11 @@ class TimetablesClient
                 'line'     => self::lineName($line, $category, $number),
                 'category' => $category,
                 'number'   => $number,
+                'type'     => '',
                 'dep'      => $dp ? self::stop($dp) : null,
                 'arr'      => $ar ? self::stop($ar) : null,
                 'messages' => [],
+                'extraMessages' => [],
             ];
         }
         return $trips;
@@ -189,7 +197,7 @@ class TimetablesClient
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
         if (!$ok) {
-            throw new TimetablesException('Invalid XML from the DB API');
+            throw new ApiException('Invalid XML from the DB API');
         }
         return $doc;
     }
@@ -201,13 +209,13 @@ class TimetablesClient
         $response = ($this->http)(self::BASE_URL . $path, $headers);
         $status = (int) $response['status'];
         if ($status === 401 || $status === 403) {
-            throw new TimetablesAuthException("DB API rejected the credentials (HTTP $status)");
+            throw new ApiAuthException("DB API rejected the credentials (HTTP $status)");
         }
         if ($status === 404 && $allowNotFound) {
             return null;
         }
         if ($status < 200 || $status >= 300) {
-            throw new TimetablesException("DB API request failed (HTTP $status): $path");
+            throw new ApiException("DB API request failed (HTTP $status): $path");
         }
         return (string) $response['body'];
     }

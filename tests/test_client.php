@@ -79,7 +79,7 @@ $tests['Client: 401 is an authentication error'] = function () {
     try {
         $client->fetchTrips('8099001', TestRegistry::$now);
         check(false, 'no exception');
-    } catch (TimetablesAuthException $e) {
+    } catch (ApiAuthException $e) {
     }
 };
 
@@ -88,9 +88,9 @@ $tests['Client: failing plan is an error, failing changes only lose realtime'] =
     try {
         $client->fetchTrips('8099001', TestRegistry::$now);
         check(false, 'no exception');
-    } catch (TimetablesAuthException $e) {
+    } catch (ApiAuthException $e) {
         check(false, 'not an auth error');
-    } catch (TimetablesException $e) {
+    } catch (ApiException $e) {
     }
     $client = new TimetablesClient('id', 'key', fakeHttp(['/18' => [200, fixture('plan_wohnort_18.xml')], '/19' => [200, fixture('plan_wohnort_19.xml')], '/fchg/8099001' => [500, '']]));
     $result = $client->fetchTrips('8099001', TestRegistry::$now);
@@ -101,7 +101,7 @@ $tests['Client: broken XML is an error'] = function () {
     try {
         TimetablesClient::parsePlan('<timetable><s');
         check(false, 'no exception');
-    } catch (TimetablesException $e) {
+    } catch (ApiException $e) {
     }
 };
 
@@ -127,7 +127,7 @@ $tests['Client: no plan for both hours is an error, not an empty board'] = funct
     try {
         $client->fetchTrips('8099001', TestRegistry::$now);
         check(false, 'no exception');
-    } catch (TimetablesException $e) {
+    } catch (ApiException $e) {
     }
 };
 
@@ -148,3 +148,19 @@ $tests['Client: DST change requests every hour once'] = function () {
     check(count($urls) === count(array_unique($urls)), json_encode($urls));
 };
 
+
+$tests['Client: Timetables is a BoardSource'] = function () {
+    check(new TimetablesClient('id', 'key', wohnortHttp()) instanceof BoardSource, 'interface');
+};
+
+$tests['Client: Timetables trips have type and extraMessages'] = function () {
+    foreach (TimetablesClient::parsePlan(fixture('plan_wohnort_18.xml')) as $trip) {
+        check($trip['type'] === '' && $trip['extraMessages'] === [], $trip['id']);
+    }
+};
+
+$tests['Client: Timetables stationByEva'] = function () {
+    $client = new TimetablesClient('id', 'key', wohnortHttp());
+    check($client->stationByEva('8099001') === ['eva' => '8099001', 'name' => 'WohnortBahnhof'], 'found');
+    check($client->stationByEva('8099999') === null, 'unknown');
+};

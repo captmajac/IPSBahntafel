@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/../libs/BoardSource.php';
 require_once __DIR__ . '/../libs/MessageCodes.php';
 require_once __DIR__ . '/../libs/TimetablesClient.php';
 require_once __DIR__ . '/../libs/TrainBadge.php';
@@ -232,11 +233,11 @@ class Bahntafel extends IPSModule
             $this->WriteAttributeInteger('LoadedUntil', $loadedUntil);
             $this->WriteAttributeString('Notice', $result['realtime'] ? '' : 'noRealtime');
             $this->SetStatus(102);
-        } catch (TimetablesAuthException $e) {
+        } catch (ApiAuthException $e) {
             $this->WriteAttributeString('Notice', 'failed');
             $this->SetStatus(self::STATUS_AUTH);
             $this->LogMessage($e->getMessage(), KL_ERROR);
-        } catch (TimetablesException $e) {
+        } catch (ApiException $e) {
             $this->WriteAttributeString('Notice', 'failed');
             $this->LogMessage($e->getMessage(), KL_ERROR);
         }
@@ -301,7 +302,7 @@ class Bahntafel extends IPSModule
     {
         try {
             $stations = $pattern === '' ? [] : $this->client()->searchStations($pattern);
-        } catch (TimetablesException $e) {
+        } catch (ApiException $e) {
             $this->message($this->errorText($e));
             return;
         }
@@ -344,7 +345,7 @@ class Bahntafel extends IPSModule
         try {
             $stations = $this->client()->searchStations($this->station()['eva'] ?? 'Berlin Hbf');
             $this->message(sprintf($this->Translate("OK: %d station(s) found"), count($stations)));
-        } catch (TimetablesException $e) {
+        } catch (ApiException $e) {
             $this->message($this->errorText($e));
         }
     }
@@ -368,9 +369,9 @@ class Bahntafel extends IPSModule
         $this->message(sprintf($this->Translate("Instance renamed: %s"), $station['name']));
     }
 
-    private function errorText(TimetablesException $e): string
+    private function errorText(ApiException $e): string
     {
-        return $e instanceof TimetablesAuthException
+        return $e instanceof ApiAuthException
             ? $this->Translate("The DB API rejected the credentials")
             : $this->Translate("The DB API could not be reached") . ': ' . $e->getMessage();
     }
