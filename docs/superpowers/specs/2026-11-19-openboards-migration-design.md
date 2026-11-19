@@ -119,7 +119,11 @@ Erst OpenBoards versuchen, bei 401/403 Timetables.
   - `cancelled` ← `cancelled` oder `journeyInfo.journeyCancelled`
   - `path`: bei der Abfahrt die Via-Namen und dann das Ziel aus `journeyInfo.destination`, bei der Ankunft die Herkunft aus `journeyInfo.origin` und dann die Via-Namen. `BoardBuilder` braucht nur den ersten bzw. letzten Eintrag und die Menge der Halte, nicht die Reihenfolge dazwischen. Die Namen kommen aus `stopPlaces`, ohne doppelte Einträge.
 - Trip: `id` ← `journeyId`. `line` ← `transport.line.name`, ohne Linie `category journeyNumber`. `category` ← `transport.category`, `number` ← `journeyNumber`.
-- `messages`: Texte der Meldungs-IDs des Halts. Übernommen werden `risCauseCodes` außer Code `00`, `disruptions` (kurzer Text), `risQualityDeviations` und `notes` mit `code`. `notes` mit `disruptionID` (Infrastruktur wie Aufzüge) und `attributes` bleiben weg. Doppelte Texte fallen raus. „Verspätung“ ohne Grund ergänzt weiter `BoardBuilder`.
+- Meldungen: Texte der Meldungs-IDs des Halts, ohne doppelte Texte, in zwei Feldern des Trips:
+  - `messages`: Hinweise zu Verspätung, Ausfall und Störung des Zugs, also `risCauseCodes` außer Code `00` und `disruptions` (kurzer Text). Sie erscheinen immer.
+  - `extraMessages`: `risQualityDeviations` (z. B. „Ein Wagen fehlt“, „Hohe Auslastung“) und `notes` mit `code` (z. B. „Heute nur einteilig“, „Ohne Halt zwischen …“). Sie erscheinen nur mit „Erweiterte Hinweise“.
+  - Immer weg bleiben `notes` mit `disruptionID` (Infrastruktur wie Aufzüge) und `attributes`.
+  - `TimetablesClient` liefert `extraMessages` leer, weil Qualitätsmeldungen dort nur als Code ohne Text kommen. Doppelte Texte fallen raus. „Verspätung“ ohne Grund ergänzt weiter `BoardBuilder`.
 - `realtime` ist immer `true`, weil Soll und Echtzeit aus derselben Antwort kommen. Scheitert der Aufruf, gibt es eine `ApiException`. 401/403 ergeben eine `ApiAuthException`. Antwortet 404 bei beiden Tafeln, gibt es eine `ApiException` „keine Tafel für Station“ wie heute.
 - `searchStations($pattern)`: `GET open-station/v1/netex?stopPlaceName=…&limit=20`. Aus dem NeTEx-XML kommen `StopPlace` → `Name` und `KeyValue` `EVA`. Treffer ohne EVA werden übersprungen. Fehlt das OpenStation-Abo (401/403), meldet das Modul „Bahnhofssuche braucht das Abo OpenStation“. Die Tafel selbst funktioniert trotzdem, wenn die Station schon gewählt ist.
 - HTTP läuft wie heute über ein injizierbares `$http`, jetzt mit Methode und Body für POST. Darüber laufen die Tests ohne Netz.
@@ -129,6 +133,7 @@ Erst OpenBoards versuchen, bei 401/403 Timetables.
 - Neue Eigenschaft `Api`: 1 = OpenBoards (Standard für neue Instanzen), 0 = Timetables. Im Formular steht sie ganz oben als Auswahl „Datenquelle“ mit dem Hinweis auf die Abschaltung Mitte 2027.
 - **Bestandsschutz:** IP-Symcon gibt einer neu registrierten Eigenschaft auch in bestehenden Instanzen den Standardwert. Darum setzt `ApplyChanges` die Eigenschaft einmalig auf Timetables, wenn die Instanz schon einmal Daten geladen hat (`FetchedAt > 0`) und das Attribut `ApiMigrated` noch leer ist. Danach entscheidet nur noch der Nutzer. Das ist die einzige automatische Änderung einer Eigenschaft. Sie erhält den bisherigen Zustand und ändert keinen Namen und kein Icon.
 - `client(): BoardSource` liefert je nach `Api` den passenden Client.
+- Neue Eigenschaft `ExtendedMessages` (Checkbox „Erweiterte Hinweise“, Standard aus). `BoardBuilder` hängt mit `settings['extended']` die `extraMessages` an die `messages` der Zeile an.
 - „Verbindung testen“ ruft bei OpenBoards eine Abfahrtstafel ab, weil das das Abo ist, auf das es ankommt. Bei Timetables bleibt es wie heute.
 - **Richtungsfilter:** `BoardBuilder` vergleicht den „Über Bahnhof“ mit den Halten des Laufwegs normalisiert: Kleinbuchstaben, ohne Leerzeichen und Satzzeichen. `Frankfurt(Main)Hbf` passt dann auf `Frankfurt (Main) Hbf`. Ein gespeicherter Wert überlebt den Wechsel der Datenquelle, ohne dass der Nutzer neu wählt.
 - Nach einem Wechsel der Datenquelle verwirft das Modul die geladenen Trips und lädt neu.
