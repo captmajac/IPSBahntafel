@@ -23,7 +23,7 @@ function sample(array $props, ?callable $http = null, int $board = 0): array
 
 $samples = [
     'Abfahrt, Wegezeit 20, Zielbahnhof'  => sample(['WalkMinutes' => 20, 'RouteStation' => 'Großstadt Hbf']),
-    'Abfahrt, Strecke ausgeblendet'      => sample(['WalkMinutes' => 20, 'RouteStation' => 'Großstadt Hbf']),
+    'Abfahrt, Wegezeit 20, alle Züge'    => sample(['WalkMinutes' => 20]),
     'Ankunft'                            => sample([], null, 1),
     'Meldung mit Sonderzeichen'          => sample([], withMessage("<b>fett</b> & 'quote'")),
     'API ausgefallen'                    => sample([], fakeHttp([])),

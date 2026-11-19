@@ -2,6 +2,8 @@
 
 Bibliothek für IP-Symcon mit Bahn-Anzeigen aus der DB OpenBoards API.
 
+![Abfahrtstafel mit Erreichbarkeit, Ausfall und Verspätung (Testdaten)](docs/bahntafel.png)
+
 Gedacht für das Tablet zu Hause: „Wann muss ich los?“ und „Wann kommt mein Besuch an?“. Eine Fahrplanauskunft mit Umstiegen ist es nicht.
 
 ## Module

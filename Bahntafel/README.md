@@ -2,6 +2,8 @@
 
 Abfahrts- und Ankunftstafel eines festen Heimatbahnhofs aus der DB OpenBoards API, mit Verspätungen, Ausfällen, Gleiswechseln und Hinweisen. Optional lässt sich die Tafel auf einen Zielbahnhof einschränken. Außerdem zeigt sie, ob man einen Zug von zu Hause noch erreicht.
 
+![Abfahrtstafel mit Erreichbarkeit, Ausfall und Verspätung (Testdaten)](../docs/bahntafel.png)
+
 ### Inhaltsverzeichnis
 
 1. [Funktionsumfang](#1-funktionsumfang)
