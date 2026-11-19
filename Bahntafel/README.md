@@ -23,7 +23,7 @@ Abfahrts- und Ankunftstafel eines festen Heimatbahnhofs aus der DB OpenBoards AP
 ### 2. Voraussetzungen
 
 - IP-Symcon ab 9.0
-- Kostenloses Konto im [DB API Marketplace](https://developers.deutschebahn.com/) mit einer Anwendung, die die API **OpenBoards** abonniert hat. Für die Bahnhofssuche zusätzlich die API **OpenStation**.
+- Kostenloses Konto im [DB API Marketplace](https://developers.deutschebahn.com/) mit einer Anwendung, die die API **OpenBoards** abonniert hat. Dazu die API **OpenStation** für die Bahnhofssuche.
 
 ### Zugang zur DB API
 
@@ -31,7 +31,7 @@ OpenBoards ist kostenlos. Man braucht dafür ein Entwicklerkonto, das in ein paa
 
 1. Im [DB API Marketplace](https://developers.deutschebahn.com/db-api-marketplace/apis/) auf *Registrieren* gehen und ein Konto anlegen. Die Bestätigungsmail öffnen und sich anmelden.
 2. Unter *Anwendungen* (bzw. *Meine Anwendungen*) eine neue Anwendung anlegen, z. B. „Symcon Bahntafel“. Danach zeigt die Seite die **Client-ID** und den **API-Key** (Client Secret). Den API-Key gleich notieren, er wird unter Umständen nur einmal angezeigt; sonst lässt sich ein neuer erzeugen.
-3. Im Katalog die API **OpenBoards** öffnen, *Abonnieren* wählen, den kostenlosen Plan nehmen und die eben angelegte Anwendung auswählen. Danach genauso **OpenStation** für die Bahnhofssuche abonnieren. Ohne OpenStation lässt sich der Bahnhof über seine EVA-Nummer wählen.
+3. Im Katalog die API **OpenBoards** öffnen, *Abonnieren* wählen, den kostenlosen Plan nehmen und die eben angelegte Anwendung auswählen. Danach genauso **OpenStation** für die Bahnhofssuche abonnieren.
 4. Client-ID und API-Key in der Instanz eintragen und „Verbindung testen“ klicken. Direkt nach dem Abonnieren kann es ein paar Minuten dauern, bis die Zugangsdaten angenommen werden.
 
 Client-ID und API-Key gehören nur in die Instanz, nicht in Skripte, Screenshots oder öffentliche Repositories.
@@ -47,8 +47,8 @@ Kompatibilität: alle Bahnhöfe in Deutschland, die die DB API kennt. Die Tafel 
 Unter *Instanz hinzufügen* die Instanz *Bahntafel* auswählen. Für mehrere Bahnhöfe legt man mehrere Instanzen an.
 
 1. Client-ID und API-Key eintragen.
-2. Unten bei „Bahnhof suchen“ den Namen eingeben (z. B. `WohnortBahnhof`) und „Suchen“ klicken. Danach oben unter „Bahnhof“ den richtigen Eintrag wählen und übernehmen. Ohne OpenStation-Abo stattdessen die EVA-Nummer des Bahnhofs eintragen und „EVA-Nummer übernehmen“ klicken.
-3. Optional die Richtung festlegen: zuerst „Bahnhöfe laden“, dann unter „Über Bahnhof“ z. B. `Großstadt Hbf` wählen. Bei „Andere Züge“ entscheidest du, ob Züge, die nicht an diesem Bahnhof halten, ausgeblendet oder grau dargestellt werden. Ausgeblendete Züge verkürzen die Tafel nicht, das Modul lädt dann weitere Stunden.
+2. Bei „Bahnhof suchen“ den Namen eingeben (z. B. `WohnortBahnhof`) und „Suchen“ klicken. Der erste Treffer steht dann direkt darunter unter „Bahnhof“. Passt er nicht, dort einen anderen Treffer wählen. Dann übernehmen.
+3. Optional die Richtung festlegen: unter „Über Bahnhof“ z. B. `Großstadt Hbf` wählen. Die Liste enthält die Bahnhöfe der zuletzt geladenen Züge, sie ist also erst nach dem ersten Abruf gefüllt. Bei „Andere Züge“ entscheidest du, ob Züge, die nicht an diesem Bahnhof halten, ausgeblendet oder grau dargestellt werden. Ausgeblendete Züge verkürzen die Tafel nicht, das Modul lädt dann weitere Stunden.
    - Abfahrt: Züge, die danach an dem Bahnhof halten.
    - Ankunft: Züge, die vorher an dem Bahnhof gehalten haben. Die Tafel zeigt dann, woher der Zug kommt und wohin er weiterfährt.
 4. Optional die Wegezeit von zu Hause zum Bahnhof eintragen, und zwar entspannt gegangen, dazu wie viele Minuten man mit zügigem Gehen spart. Die Abfahrtstafel zeigt dann *erreichbar* (entspannt), *knapp* (nur zügig) oder *nicht erreichbar*.
@@ -64,7 +64,7 @@ Unter der Instanz liegen:
 | Einstellung | Bedeutung |
 |---|---|
 | Client-ID, API-Key | Zugangsdaten aus dem DB API Marketplace |
-| Bahnhof | Heimatbahnhof, über „Bahnhof suchen“ oder „EVA-Nummer übernehmen“ wählen |
+| Bahnhof | Heimatbahnhof, über „Bahnhof suchen“ wählen |
 | Über Bahnhof | Optional: nur Züge, die dort halten (Abfahrt danach, Ankunft davor) |
 | Andere Züge | Ausblenden oder grau darstellen |
 | Züge | Gattungen: Fernverkehr, Regionalverkehr, S-Bahn, Bus, Tram, Sonstige |

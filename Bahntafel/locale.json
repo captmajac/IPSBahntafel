@@ -3,9 +3,7 @@
         "de": {
             "Client ID": "Client-ID",
             "API key": "API-Key",
-            "Home station: enter a name below under \"Search station\", then choose it here": "Heimatbahnhof: unten bei „Bahnhof suchen“ einen Namen eingeben, dann hier auswählen",
             "Station": "Bahnhof",
-            "Direction (optional): only trains that stop at this station, on departures after, on arrivals before the home station; \"Load stations\" below fills the list": "Richtung (optional): nur Züge, die an diesem Bahnhof halten – bei Abfahrt danach, bei Ankunft davor; „Bahnhöfe laden“ unten füllt die Liste",
             "Via station": "Über Bahnhof",
             "Other trains": "Andere Züge",
             "Hide": "ausblenden",
@@ -25,7 +23,6 @@
             "Update interval": "Aktualisierungsintervall",
             "Search station": "Bahnhof suchen",
             "Search": "Suchen",
-            "Load stations": "Bahnhöfe laden",
             "Test connection": "Verbindung testen",
             "Name instance after the station": "Instanz nach Bahnhof benennen",
             "Please choose a station first": "Bitte zuerst einen Bahnhof wählen",
@@ -41,11 +38,10 @@
             "The DB API could not be reached": "Die DB API ist nicht erreichbar",
             "Departure": "Abfahrt",
             "Arrival": "Ankunft",
-            "EVA number": "EVA-Nummer",
-            "Use EVA number": "EVA-Nummer übernehmen",
-            "The station search needs a subscription to the API OpenStation. Alternatively enter the EVA number.": "Die Bahnhofssuche braucht ein Abo der API OpenStation. Alternativ die EVA-Nummer eintragen.",
-            "Please enter a 7-digit EVA number": "Bitte eine 7-stellige EVA-Nummer eintragen",
-            "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\")": "Zugang zum DB API Marketplace (APIs „OpenBoards“ und „OpenStation“)"
+            "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\")": "Zugang zum DB API Marketplace (APIs „OpenBoards“ und „OpenStation“)",
+            "Home station: enter a name, search, then check the station below and apply": "Heimatbahnhof: Namen eingeben, suchen, darunter den Bahnhof prüfen und übernehmen",
+            "Direction (optional): only trains that stop at this station, on departures after, on arrivals before the home station; the list contains the stations of the loaded trains": "Richtung (optional): nur Züge, die an diesem Bahnhof halten – bei Abfahrt danach, bei Ankunft davor; die Liste enthält die Bahnhöfe der geladenen Züge",
+            "The station search needs a subscription to the API OpenStation in the DB API Marketplace.": "Die Bahnhofssuche braucht ein Abo der API OpenStation im DB API Marketplace."
         }
     }
 }

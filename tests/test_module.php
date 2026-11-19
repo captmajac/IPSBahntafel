@@ -2,6 +2,16 @@
 
 // Bahntafel module against the Symcon stub
 
+function formElement(IPSModule $m, string $name): array
+{
+    foreach (json_decode($m->GetConfigurationForm(), true)['elements'] as $element) {
+        if (($element['name'] ?? '') === $name) {
+            return $element;
+        }
+    }
+    throw new CheckFailed("no element $name");
+}
+
 function lastFormUpdate(IPSModule $m, string $field): array
 {
     foreach (array_reverse($m->formUpdates) as [$f, $parameter, $value]) {
@@ -167,17 +177,6 @@ $tests['Module: station search without result or with an error says so'] = funct
     check(str_contains(popup($m, fn () => $m->RequestAction('SearchStation', 'WohnortBahnhof')), 'OpenStation'), 'no OpenStation subscription');
 };
 
-$tests['Module: route stations from both boards'] = function () {
-    $m = makeBoard();
-    $m->RequestAction('LoadStations', '');
-    $options = lastFormUpdate($m, 'RouteStation');
-    check($options[0] === ['caption' => '(none)', 'value' => ''], 'none first');
-    $names = array_column(array_slice($options, 1), 'value');
-    check(in_array('Großstadt Hbf', $names, true) && in_array('Südstadt Hbf', $names, true) && in_array('Messestadt Hbf', $names, true), 'dep and arr');
-    $sorted = $names;
-    sort($sorted, SORT_STRING | SORT_FLAG_CASE);
-    check($names === $sorted && count($names) === count(array_unique($names)), 'sorted, unique');
-};
 
 $tests['Module: test connection'] = function () {
     $m = makeBoard();
@@ -254,14 +253,6 @@ $tests['Module: extended notes setting'] = function () {
     check($re6(makeBoard())['messages'] === [], 'off');
 };
 
-$tests['Module: EVA number fills the station list'] = function () {
-    $m = makeBoard(['Station' => '']);
-    check(str_contains(popup($m, fn () => $m->RequestAction('UseEva', '12')), '7-digit'), 'invalid');
-    $m->RequestAction('UseEva', ' 8099001 ');
-    check(in_array(WOHNORT, array_column(lastFormUpdate($m, 'Station'), 'value'), true), 'station offered');
-    TestRegistry::$http = fakeHttp([]);
-    check(str_contains(popup($m, fn () => $m->RequestAction('UseEva', '8099999')), 'No station found'), 'unknown');
-};
 
 $tests['Module: search through OpenStation'] = function () {
     $m = makeBoard(['Station' => '']);
@@ -274,10 +265,42 @@ $tests['Module: test connection names the station'] = function () {
     check(popup($m, fn () => $m->RequestAction('TestConnection', '')) === 'OK: WohnortBahnhof', 'name');
 };
 
-$tests['Module: loading the stations keeps the saved route station'] = function () {
-    $m = makeBoard(['RouteStation' => 'Großstadt(Main)Hbf']);
-    $m->RequestAction('LoadStations', '');
-    $values = array_column(lastFormUpdate($m, 'RouteStation'), 'value');
+
+$tests['Form: station search right above the station, no EVA input, no load button'] = function () {
+    $form = json_decode(file_get_contents(__DIR__ . '/../Bahntafel/form.json'), true);
+    $names = array_map(fn ($e) => $e['name'] ?? '', $form['elements']);
+    $row = array_values(array_filter($form['elements'], fn ($e) => $e['type'] === 'RowLayout' && in_array('StationSearch', array_column($e['items'], 'name'), true)));
+    check(count($row) === 1 && str_contains($row[0]['items'][1]['onClick'], '\'SearchStation\', $StationSearch'), 'search field and button in one row');
+    check(array_search($row[0], $form['elements'], true) === array_search('Station', $names, true) - 1, 'right above the station');
+    $actions = json_encode($form['actions']);
+    check(!str_contains($actions, 'Eva') && !str_contains($actions, 'LoadStations') && !str_contains($actions, 'SearchStation'), $actions);
+};
+
+$tests['Module: station search selects the first station'] = function () {
+    $m = makeBoard(['Station' => '']);
+    $m->RequestAction('SearchStation', 'WohnortBahnhof');
+    check(in_array(['Station', 'value', WOHNORT], $m->formUpdates, true), 'WohnortBahnhof selected');
+};
+
+$tests['Module: route stations from both boards when the form opens'] = function () {
+    $options = formElement(makeBoard(), 'RouteStation')['options'];
+    check($options[0]['value'] === '', 'none first');
+    $names = array_column(array_slice($options, 1), 'value');
+    check(in_array('Großstadt Hbf', $names, true) && in_array('Südstadt Hbf', $names, true) && in_array('Messestadt Hbf', $names, true), 'dep and arr');
+    $sorted = $names;
+    sort($sorted, SORT_STRING | SORT_FLAG_CASE);
+    check($names === $sorted && count($names) === count(array_unique($names)), 'sorted, unique');
+};
+
+$tests['Module: route list keeps the saved route station'] = function () {
+    $values = array_column(formElement(makeBoard(['RouteStation' => 'Großstadt(Main)Hbf']), 'RouteStation')['options'], 'value');
     check(in_array('Großstadt(Main)Hbf', $values, true) && in_array('Großstadt Hbf', $values, true), json_encode($values));
     check(count($values) === count(array_unique($values)), 'no duplicates');
+};
+
+$tests['Module: without OpenStation the search says so'] = function () {
+    $m = makeBoard();
+    TestRegistry::$http = fakeHttp(['limit=20' => [401, '']]);
+    $text = popup($m, fn () => $m->RequestAction('SearchStation', 'WohnortBahnhof'));
+    check(str_contains($text, 'OpenStation') && !str_contains($text, 'EVA'), $text);
 };

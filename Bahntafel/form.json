@@ -3,9 +3,16 @@
         { "type": "Label", "caption": "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\")" },
         { "type": "ValidationTextBox", "name": "ClientId", "caption": "Client ID", "width": "400px" },
         { "type": "PasswordTextBox", "name": "ApiKey", "caption": "API key", "width": "400px" },
-        { "type": "Label", "caption": "Home station: enter a name below under \"Search station\", then choose it here" },
+        { "type": "Label", "caption": "Home station: enter a name, search, then check the station below and apply" },
+        {
+            "type": "RowLayout",
+            "items": [
+                { "type": "ValidationTextBox", "name": "StationSearch", "caption": "Search station", "width": "300px" },
+                { "type": "Button", "caption": "Search", "onClick": "IPS_RequestAction($id, 'SearchStation', $StationSearch);" }
+            ]
+        },
         { "type": "Select", "name": "Station", "caption": "Station", "width": "400px", "options": [] },
-        { "type": "Label", "caption": "Direction (optional): only trains that stop at this station, on departures after, on arrivals before the home station; \"Load stations\" below fills the list" },
+        { "type": "Label", "caption": "Direction (optional): only trains that stop at this station, on departures after, on arrivals before the home station; the list contains the stations of the loaded trains" },
         { "type": "Select", "name": "RouteStation", "caption": "Via station", "width": "400px", "options": [] },
         {
             "type": "Select", "name": "OffRoute", "caption": "Other trains",
@@ -34,11 +41,6 @@
         { "type": "NumberSpinner", "name": "IntervalMinutes", "caption": "Update interval", "suffix": "min", "minimum": 15, "maximum": 240 }
     ],
     "actions": [
-        { "type": "ValidationTextBox", "name": "Search", "caption": "Search station", "width": "400px" },
-        { "type": "Button", "caption": "Search", "onClick": "IPS_RequestAction($id, 'SearchStation', $Search);" },
-        { "type": "ValidationTextBox", "name": "Eva", "caption": "EVA number", "width": "200px" },
-        { "type": "Button", "caption": "Use EVA number", "onClick": "IPS_RequestAction($id, 'UseEva', $Eva);" },
-        { "type": "Button", "caption": "Load stations", "onClick": "IPS_RequestAction($id, 'LoadStations', '');" },
         { "type": "Button", "caption": "Test connection", "onClick": "IPS_RequestAction($id, 'TestConnection', '');" },
         { "type": "Button", "caption": "Name instance after the station", "onClick": "IPS_RequestAction($id, 'NameInstance', '');" },
         { "type": "PopupAlert", "name": "Message", "visible": false, "popup": { "items": [{ "type": "Label", "name": "MessageText", "caption": "" }] } }

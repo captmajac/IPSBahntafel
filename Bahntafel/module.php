@@ -38,6 +38,7 @@ class Bahntafel extends IPSModule
         $this->RegisterPropertyString('ClientId', '');
         $this->RegisterPropertyString('ApiKey', '');
         // {"eva": "8099001", "name": "WohnortBahnhof"} or ''
+        $this->RegisterPropertyString('StationSearch', '');  // search text above the station list
         $this->RegisterPropertyString('Station', '');
         $this->RegisterPropertyString('RouteStation', '');
         $this->RegisterPropertyInteger('OffRoute', 0);  // 0 hide, 1 grey
@@ -113,10 +114,9 @@ class Bahntafel extends IPSModule
     public function GetConfigurationForm()
     {
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $route = $this->ReadPropertyString('RouteStation');
         $options = [
             'Station'      => [$this->currentStationOption()],
-            'RouteStation' => array_merge([self::option($this->Translate("(none)"), '')], $route === '' ? [] : [self::option($route, $route)]),
+            'RouteStation' => $this->routeOptions(),
         ];
         $form['elements'] = self::withOptions($form['elements'], $options);
         return json_encode($form);
@@ -163,12 +163,6 @@ class Bahntafel extends IPSModule
                 break;
             case 'SearchStation':
                 $this->searchStation(trim((string) $Value));
-                break;
-            case 'LoadStations':
-                $this->loadStations();
-                break;
-            case 'UseEva':
-                $this->useEva(trim((string) $Value));
                 break;
             case 'TestConnection':
                 $this->testConnection();
@@ -313,29 +307,13 @@ class Bahntafel extends IPSModule
         try {
             $stations = $pattern === '' ? [] : $this->client()->searchStations($pattern);
         } catch (ApiAuthException $e) {
-            $this->message($this->Translate("The station search needs a subscription to the API OpenStation. Alternatively enter the EVA number."));
+            $this->message($this->Translate("The station search needs a subscription to the API OpenStation in the DB API Marketplace."));
             return;
         } catch (ApiException $e) {
             $this->message($this->errorText($e));
             return;
         }
         $this->offerStations($stations);
-    }
-
-    // a station found by its EVA number, offered like a search result
-    private function useEva(string $eva): void
-    {
-        if (preg_match('/^\d{7}$/', $eva) !== 1) {
-            $this->message($this->Translate("Please enter a 7-digit EVA number"));
-            return;
-        }
-        try {
-            $station = $this->client()->stationByEva($eva);
-        } catch (ApiException $e) {
-            $this->message($this->errorText($e));
-            return;
-        }
-        $this->offerStations($station === null ? [] : [$station]);
     }
 
     private function offerStations(array $stations): void
@@ -353,6 +331,8 @@ class Bahntafel extends IPSModule
             }
         }
         $this->UpdateFormField('Station', 'options', json_encode($options));
+        // the first hit is selected, "Apply" saves it
+        $this->UpdateFormField('Station', 'value', self::option($stations[0]['name'], json_encode(['eva' => $stations[0]['eva'], 'name' => $stations[0]['name']]))['value']);
     }
 
     private function currentStationOption(): array
@@ -361,8 +341,8 @@ class Bahntafel extends IPSModule
         return self::option($station === null ? $this->Translate("(none)") : $station['name'], $this->ReadPropertyString('Station'));
     }
 
-    // stations on the paths of the loaded trips, departures and arrivals together
-    private function loadStations(): void
+    // stations on the paths of the loaded trips, departures and arrivals together; no API call
+    private function routeOptions(): array
     {
         $trips = json_decode($this->ReadAttributeString('Trips'), true);
         $names = array_unique(array_merge(BoardBuilder::routeStations($trips, 'dep'), BoardBuilder::routeStations($trips, 'arr')));
@@ -376,7 +356,7 @@ class Bahntafel extends IPSModule
         foreach ($names as $name) {
             $options[] = self::option($name, $name);
         }
-        $this->UpdateFormField('RouteStation', 'options', json_encode($options));
+        return $options;
     }
 
     private function testConnection(): void
