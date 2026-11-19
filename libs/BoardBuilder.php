@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 // Departure or arrival board from the trips of TimetablesClient, for a given time; no API calls.
 // settings: board 'dep'|'arr', groups (TrainBadge groups to show), route (station name or ''),
-//           offRoute 'hide'|'grey', rows, walk (minutes, 0 = no reachability), tolerance (minutes)
+//           offRoute 'hide'|'grey', rows, walk (minutes, 0 = no reachability), tolerance (minutes),
+//           extended (bool, optional: also the extraMessages)
 class BoardBuilder
 {
     public static function build(array $trips, int $now, array $settings): array
@@ -13,14 +14,14 @@ class BoardBuilder
         $rows = [];
         foreach ($trips as $trip) {
             $stop = $trip[$part];
-            if ($stop === null || !in_array(TrainBadge::group($trip['line'], $trip['category']), $settings['groups'], true)) {
+            if ($stop === null || !in_array(TrainBadge::group($trip['line'], $trip['category'], $trip['type'] ?? ''), $settings['groups'], true)) {
                 continue;
             }
             $time = $stop['changed'] ?? $stop['planned'];
             if ($time < $now) {
                 continue;
             }
-            $offRoute = $settings['route'] !== '' && !in_array($settings['route'], $stop['path'], true);
+            $offRoute = $settings['route'] !== '' && !self::onPath($settings['route'], $stop['path']);
             if ($offRoute && $settings['offRoute'] === 'hide') {
                 continue;
             }
@@ -29,6 +30,11 @@ class BoardBuilder
             // departures: destination; arrivals: origin and, if the train goes on, its destination
             $direction = $part === 'dep' ? end($stop['path']) : reset($stop['path']);
             $continuesTo = $part === 'arr' && $trip['dep'] !== null ? end($trip['dep']['path']) : false;
+            // the API often gives no reason for a delay
+            $messages = $delayed && $trip['messages'] === [] ? ['Verspätung'] : $trip['messages'];
+            if ($settings['extended'] ?? false) {
+                $messages = array_values(array_unique(array_merge($messages, $trip['extraMessages'] ?? [])));
+            }
             $rows[] = [
                 'id'              => $trip['id'],
                 'line'            => $trip['line'],
@@ -45,12 +51,28 @@ class BoardBuilder
                 // a delay may shrink, so the walk is planned for the earlier of planned and changed time
                 'reach'           => self::reach($part, $stop['cancelled'] || $offRoute, intdiv(min($time, $stop['planned']) - $now, 60), $settings),
                 'offRoute'        => $offRoute,
-                // the API often gives no reason for a delay
-                'messages'        => $delayed && $trip['messages'] === [] ? ['Verspätung'] : $trip['messages'],
+                'messages'        => $messages,
             ];
         }
         usort($rows, fn (array $a, array $b) => $a['time'] <=> $b['time']);
         return array_slice($rows, 0, max(1, $settings['rows']));
+    }
+
+    // same station in another spelling, e.g. Großstadt(Main)Hbf (Timetables) and Großstadt (Main) Hbf (OpenBoards)
+    public static function sameStation(string $a, string $b): bool
+    {
+        $key = fn (string $name) => preg_replace('/[^\p{L}\p{N}]/u', '', mb_strtolower($name));
+        return $key($a) === $key($b);
+    }
+
+    private static function onPath(string $station, array $path): bool
+    {
+        foreach ($path as $stop) {
+            if (self::sameStation($station, $stop)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // all stations of the paths of one board part, for choosing the route station

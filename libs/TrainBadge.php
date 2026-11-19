@@ -35,8 +35,22 @@ class TrainBadge
         'TRAM' => ['#c00', false],
     ];
 
-    public static function group(string $line, string $category): string
+    // OpenBoards transport type => group; it wins over the patterns
+    private const TYPES = [
+        'HIGH_SPEED_TRAIN'     => self::LONG,
+        'INTERCITY_TRAIN'      => self::LONG,
+        'REGIONAL_TRAIN'       => self::REGIONAL,
+        'INTER_REGIONAL_TRAIN' => self::REGIONAL,
+        'CITY_TRAIN'           => self::SBAHN,
+        'BUS'                  => self::BUS,
+        'TRAM'                 => self::TRAM,
+    ];
+
+    public static function group(string $line, string $category, string $type = ''): string
     {
+        if (isset(self::TYPES[$type])) {
+            return self::TYPES[$type];
+        }
         $label = self::label($line, $category);
         return self::RULES[$label][0] ?? self::OTHER;
     }

@@ -39,3 +39,11 @@ $tests['Badge: SVG colors and escaping'] = function () {
     check(str_contains(TrainBadge::svg('RE'), '#5a5a5a'), 'RE gray');
     check(!str_contains(TrainBadge::svg('<x>'), '<x>'), 'escaped');
 };
+
+$tests['Badge: type wins over the line'] = function () {
+    check(TrainBadge::group('RE30', 'ENO', 'REGIONAL_TRAIN') === TrainBadge::REGIONAL, 'regional');
+    check(TrainBadge::group('X1', 'ABC', 'CITY_TRAIN') === TrainBadge::SBAHN, 'type over pattern');
+    check(TrainBadge::group('ICE 123', 'DB', '') === TrainBadge::LONG, 'no type: pattern');
+    check(TrainBadge::group('Foo', 'ABC', 'UNKNOWN') === TrainBadge::OTHER, 'unknown type: pattern');
+    check(TrainBadge::group('X2', 'ABC', 'INTERCITY_TRAIN') === TrainBadge::LONG, 'intercity');
+};

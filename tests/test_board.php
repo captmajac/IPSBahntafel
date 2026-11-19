@@ -149,3 +149,34 @@ $tests['Board: route stations and next train'] = function () {
     check(BoardBuilder::nextTrain($rows)['id'] === 'next', 'next');
     check(BoardBuilder::nextTrain([]) === null, 'none');
 };
+
+$tests['Board: route station matches in another spelling'] = function () {
+    $trips = [trip('a', 10, ['dep' => ['path' => ['Großstadt (Main) Hbf', 'Grenzstadt']]])];
+    $rows = BoardBuilder::build($trips, TestRegistry::$now, settings(['route' => 'Großstadt(Main)Hbf', 'offRoute' => 'grey']));
+    check($rows[0]['offRoute'] === false, 'same station');
+    $rows = BoardBuilder::build($trips, TestRegistry::$now, settings(['route' => 'Großstadt Süd', 'offRoute' => 'grey']));
+    check($rows[0]['offRoute'] === true, 'other station');
+};
+
+$tests['Board: extended messages only when enabled'] = function () {
+    $trips = [trip('a', 10, ['messages' => ['Bauarbeiten'], 'extraMessages' => ['Ein Wagen fehlt', 'Bauarbeiten']])];
+    check(BoardBuilder::build($trips, TestRegistry::$now, settings())[0]['messages'] === ['Bauarbeiten'], 'off');
+    check(BoardBuilder::build($trips, TestRegistry::$now, settings(['extended' => true]))[0]['messages'] === ['Bauarbeiten', 'Ein Wagen fehlt'], 'on');
+};
+
+$tests['Board: delay reason ignores extra messages'] = function () {
+    $trips = [trip('a', 10, ['dep' => ['changed' => TestRegistry::$now + 900], 'extraMessages' => ['Ein Wagen fehlt']])];
+    $rows = BoardBuilder::build($trips, TestRegistry::$now, settings(['extended' => true]));
+    check($rows[0]['messages'] === ['Verspätung', 'Ein Wagen fehlt'], json_encode($rows[0]['messages']));
+};
+
+$tests['Board: trips stored by the previous version'] = function () {
+    $trip = trip('a', 10);
+    unset($trip['type'], $trip['extraMessages']);
+    check(count(BoardBuilder::build([$trip], TestRegistry::$now, settings(['extended' => true]))) === 1, 'row');
+};
+
+$tests['Board: group from type'] = function () {
+    $trips = [trip('a', 10, ['line' => 'X1', 'category' => 'ABC', 'type' => 'CITY_TRAIN'])];
+    check(ids(BoardBuilder::build($trips, TestRegistry::$now, settings(['groups' => [TrainBadge::SBAHN]]))) === ['a'], 'S-Bahn by type');
+};
