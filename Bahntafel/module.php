@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../libs/BoardSource.php';
 require_once __DIR__ . '/../libs/MessageCodes.php';
+require_once __DIR__ . '/../libs/OpenBoardsClient.php';
 require_once __DIR__ . '/../libs/TimetablesClient.php';
 require_once __DIR__ . '/../libs/TrainBadge.php';
 require_once __DIR__ . '/../libs/BoardBuilder.php';
 require_once __DIR__ . '/../libs/BoardHtml.php';
 
-// Departure and arrival board of one station from the DB Timetables API, for the WebFront and the tile visualization
+// Departure and arrival board of one station from the DB OpenBoards or Timetables API, for the WebFront and the tile visualization
 class Bahntafel extends IPSModule
 {
     const STATUS_NOT_CONFIGURED = 201;
@@ -36,6 +37,8 @@ class Bahntafel extends IPSModule
         //Never delete this line!
         parent::Create();
 
+        // 0 default (DefaultApi), 1 OpenBoards, 2 Timetables
+        $this->RegisterPropertyInteger('Api', 0);
         $this->RegisterPropertyString('ClientId', '');
         $this->RegisterPropertyString('ApiKey', '');
         // {"eva": "8099001", "name": "WohnortBahnhof"} or ''
@@ -49,8 +52,11 @@ class Bahntafel extends IPSModule
         $this->RegisterPropertyInteger('WalkMinutes', 0);
         $this->RegisterPropertyInteger('ToleranceMinutes', 4);
         $this->RegisterPropertyInteger('IntervalMinutes', 60);
+        $this->RegisterPropertyBoolean('ExtendedMessages', false);
 
-        // trips of TimetablesClient::fetchTrips, of the station in TripsEva
+        // what the default data source means for this instance: 'openboards' | 'timetables', set once
+        $this->RegisterAttributeString('DefaultApi', '');
+        // trips of BoardSource::fetchTrips, of the data source and station in TripsEva ('openboards:8099001')
         $this->RegisterAttributeString('Trips', '[]');
         $this->RegisterAttributeString('TripsEva', '');
         $this->RegisterAttributeInteger('FetchedAt', 0);
@@ -84,10 +90,15 @@ class Bahntafel extends IPSModule
             IPS_SetIcon($this->GetIDForIdent('BoardHtml'), 'clock');
         }
 
-        $eva = $this->station()['eva'] ?? '';
-        if ($this->ReadAttributeString('TripsEva') !== $eva) {
+        // before the trips are reset: an instance that has fetched before the update keeps Timetables
+        if ($this->ReadAttributeString('DefaultApi') === '') {
+            $this->WriteAttributeString('DefaultApi', $this->ReadAttributeInteger('FetchedAt') > 0 ? 'timetables' : 'openboards');
+        }
+
+        $key = $this->api() . ':' . ($this->station()['eva'] ?? '');
+        if ($this->ReadAttributeString('TripsEva') !== $key) {
             $this->WriteAttributeString('Trips', '[]');
-            $this->WriteAttributeString('TripsEva', $eva);
+            $this->WriteAttributeString('TripsEva', $key);
             $this->WriteAttributeInteger('FetchedAt', 0);
             $this->WriteAttributeInteger('LoadedUntil', 0);
             $this->WriteAttributeString('Notice', '');
@@ -119,6 +130,13 @@ class Bahntafel extends IPSModule
             'RouteStation' => array_merge([self::option($this->Translate("(none)"), '')], $route === '' ? [] : [self::option($route, $route)]),
         ];
         $form['elements'] = self::withOptions($form['elements'], $options);
+        foreach ($form['elements'] as &$element) {
+            if (($element['name'] ?? '') === 'Api') {
+                $default = $this->ReadAttributeString('DefaultApi') === 'timetables' ? 'Timetables' : 'OpenBoards';
+                $element['options'][0]['caption'] = sprintf($this->Translate("Default (%s)"), $default);
+            }
+        }
+        unset($element);
         return json_encode($form);
     }
 
@@ -167,6 +185,9 @@ class Bahntafel extends IPSModule
             case 'LoadStations':
                 $this->loadStations();
                 break;
+            case 'UseEva':
+                $this->useEva(trim((string) $Value));
+                break;
             case 'TestConnection':
                 $this->testConnection();
                 break;
@@ -183,9 +204,26 @@ class Bahntafel extends IPSModule
         return time();
     }
 
-    protected function client(): TimetablesClient
+    // HTTP for the clients; null is curl
+    protected function http(): ?callable
     {
-        return new TimetablesClient($this->ReadPropertyString('ClientId'), $this->ReadPropertyString('ApiKey'));
+        return null;
+    }
+
+    protected function client(): BoardSource
+    {
+        $class = $this->api() === 'timetables' ? TimetablesClient::class : OpenBoardsClient::class;
+        return new $class($this->ReadPropertyString('ClientId'), $this->ReadPropertyString('ApiKey'), $this->http());
+    }
+
+    // 'openboards' | 'timetables'
+    private function api(): string
+    {
+        return match ($this->ReadPropertyInteger('Api')) {
+            1       => 'openboards',
+            2       => 'timetables',
+            default => $this->ReadAttributeString('DefaultApi') === 'timetables' ? 'timetables' : 'openboards',
+        };
     }
 
     // data of the tile: rows of the chosen board, next train for the small tile, badge SVGs by label
@@ -277,6 +315,7 @@ class Bahntafel extends IPSModule
             'rows'      => $this->ReadPropertyInteger('Rows'),
             'walk'      => $this->ReadPropertyInteger('WalkMinutes'),
             'tolerance' => $this->ReadPropertyInteger('ToleranceMinutes'),
+            'extended'  => $this->ReadPropertyBoolean('ExtendedMessages'),
         ]);
     }
 
@@ -302,10 +341,36 @@ class Bahntafel extends IPSModule
     {
         try {
             $stations = $pattern === '' ? [] : $this->client()->searchStations($pattern);
+        } catch (ApiAuthException $e) {
+            $this->message($this->api() === 'openboards'
+                ? $this->Translate("The station search needs a subscription to the API OpenStation. Alternatively enter the EVA number.")
+                : $this->errorText($e));
+            return;
         } catch (ApiException $e) {
             $this->message($this->errorText($e));
             return;
         }
+        $this->offerStations($stations);
+    }
+
+    // a station found by its EVA number, offered like a search result
+    private function useEva(string $eva): void
+    {
+        if (preg_match('/^\d{7}$/', $eva) !== 1) {
+            $this->message($this->Translate("Please enter a 7-digit EVA number"));
+            return;
+        }
+        try {
+            $station = $this->client()->stationByEva($eva);
+        } catch (ApiException $e) {
+            $this->message($this->errorText($e));
+            return;
+        }
+        $this->offerStations($station === null ? [] : [$station]);
+    }
+
+    private function offerStations(array $stations): void
+    {
         if ($stations === []) {
             $this->message($this->Translate("No station found"));
             return;
@@ -343,8 +408,9 @@ class Bahntafel extends IPSModule
     private function testConnection(): void
     {
         try {
-            $stations = $this->client()->searchStations($this->station()['eva'] ?? 'Berlin Hbf');
-            $this->message(sprintf($this->Translate("OK: %d station(s) found"), count($stations)));
+            // a board for OpenBoards, a station search for Timetables: the subscription that matters
+            $station = $this->client()->stationByEva($this->station()['eva'] ?? '8000105');
+            $this->message($station === null ? $this->Translate("No station found") : sprintf($this->Translate("OK: %s"), $station['name']));
         } catch (ApiException $e) {
             $this->message($this->errorText($e));
         }
@@ -390,7 +456,7 @@ class Bahntafel extends IPSModule
     // start of the hour after the one of $time, local time like the API
     private static function nextHourStart(int $time): int
     {
-        $hour = (new DateTime('@' . $time))->setTimezone(new DateTimeZone(TimetablesClient::TIMEZONE));
+        $hour = (new DateTime('@' . $time))->setTimezone(new DateTimeZone(OpenBoardsClient::TIMEZONE));
         $hour->setTime((int) $hour->format('H'), 0);
         return $hour->getTimestamp() + 3600;
     }

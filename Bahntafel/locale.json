@@ -1,7 +1,11 @@
 {
     "translations": {
         "de": {
-            "Access to the DB API Marketplace (API \"Timetables\")": "Zugang zum DB API Marketplace (API „Timetables“)",
+            "Data source": "Datenquelle",
+            "Default": "Standard",
+            "OpenBoards": "OpenBoards",
+            "Timetables (shut down in mid-2027)": "Timetables (Abschaltung Mitte 2027)",
+            "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\"; Timetables only for existing subscriptions)": "Zugang zum DB API Marketplace (APIs „OpenBoards“ und „OpenStation“; Timetables nur mit bestehendem Abo)",
             "Client ID": "Client-ID",
             "API key": "API-Key",
             "Home station: enter a name below under \"Search station\", then choose it here": "Heimatbahnhof: unten bei „Bahnhof suchen“ einen Namen eingeben, dann hier auswählen",
@@ -18,6 +22,7 @@
             "Bus": "Bus",
             "Tram": "Tram",
             "Other": "Sonstige",
+            "Extended notes (e.g. missing coach, high occupancy)": "Erweiterte Hinweise (z. B. fehlender Wagen, hohe Auslastung)",
             "Rows on the board": "Zeilen auf der Tafel",
             "Reachability (departures only)": "Erreichbarkeit (nur Abfahrt)",
             "Walking time to the station, relaxed (0 = off)": "Wegezeit zum Bahnhof, entspannt (0 = aus)",
@@ -36,11 +41,16 @@
             "Timetable": "Tafel",
             "(none)": "(keiner)",
             "No station found": "Kein Bahnhof gefunden",
-            "OK: %d station(s) found": "OK: %d Bahnhof/Bahnhöfe gefunden",
+            "OK: %s": "OK: %s",
             "The DB API rejected the credentials": "Die DB API hat die Zugangsdaten abgelehnt",
             "The DB API could not be reached": "Die DB API ist nicht erreichbar",
             "Departure": "Abfahrt",
-            "Arrival": "Ankunft"
+            "Arrival": "Ankunft",
+            "EVA number": "EVA-Nummer",
+            "Use EVA number": "EVA-Nummer übernehmen",
+            "Default (%s)": "Standard (%s)",
+            "The station search needs a subscription to the API OpenStation. Alternatively enter the EVA number.": "Die Bahnhofssuche braucht ein Abo der API OpenStation. Alternativ die EVA-Nummer eintragen.",
+            "Please enter a 7-digit EVA number": "Bitte eine 7-stellige EVA-Nummer eintragen"
         }
     }
 }

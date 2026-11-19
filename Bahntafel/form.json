@@ -1,6 +1,14 @@
 {
     "elements": [
-        { "type": "Label", "caption": "Access to the DB API Marketplace (API \"Timetables\")" },
+        {
+            "type": "Select", "name": "Api", "caption": "Data source",
+            "options": [
+                { "caption": "Default", "value": 0 },
+                { "caption": "OpenBoards", "value": 1 },
+                { "caption": "Timetables (shut down in mid-2027)", "value": 2 }
+            ]
+        },
+        { "type": "Label", "caption": "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\"; Timetables only for existing subscriptions)" },
         { "type": "ValidationTextBox", "name": "ClientId", "caption": "Client ID", "width": "400px" },
         { "type": "PasswordTextBox", "name": "ApiKey", "caption": "API key", "width": "400px" },
         { "type": "Label", "caption": "Home station: enter a name below under \"Search station\", then choose it here" },
@@ -21,6 +29,7 @@
         { "type": "CheckBox", "name": "ShowBus", "caption": "Bus" },
         { "type": "CheckBox", "name": "ShowTram", "caption": "Tram" },
         { "type": "CheckBox", "name": "ShowOther", "caption": "Other" },
+        { "type": "CheckBox", "name": "ExtendedMessages", "caption": "Extended notes (e.g. missing coach, high occupancy)" },
         { "type": "NumberSpinner", "name": "Rows", "caption": "Rows on the board", "minimum": 1, "maximum": 20 },
         { "type": "Label", "caption": "Reachability (departures only)" },
         {
@@ -35,6 +44,8 @@
     "actions": [
         { "type": "ValidationTextBox", "name": "Search", "caption": "Search station", "width": "400px" },
         { "type": "Button", "caption": "Search", "onClick": "IPS_RequestAction($id, 'SearchStation', $Search);" },
+        { "type": "ValidationTextBox", "name": "Eva", "caption": "EVA number", "width": "200px" },
+        { "type": "Button", "caption": "Use EVA number", "onClick": "IPS_RequestAction($id, 'UseEva', $Eva);" },
         { "type": "Button", "caption": "Load stations", "onClick": "IPS_RequestAction($id, 'LoadStations', '');" },
         { "type": "Button", "caption": "Test connection", "onClick": "IPS_RequestAction($id, 'TestConnection', '');" },
         { "type": "Button", "caption": "Name instance after the station", "onClick": "IPS_RequestAction($id, 'NameInstance', '');" },

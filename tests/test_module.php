@@ -252,3 +252,88 @@ $tests['Module: fetch after Symcon has started'] = function () {
     $m->MessageSink(TestRegistry::$now, 0, IPS_KERNELSTARTED, []);
     check(count(TestRegistry::$calls) === 4, 'fetched');
 };
+
+$tests['Module: new instance uses OpenBoards'] = function () {
+    $m = makeBoard(['Api' => 0]);
+    check($m->attributes['DefaultApi'] === 'openboards', $m->attributes['DefaultApi']);
+    check(requested('/open-boards/v1/'), json_encode(array_column(TestRegistry::$calls, 0)));
+    check(str_contains($m->value('BoardHtml'), 'RE6'), 'board');
+};
+
+$tests['Module: existing instance keeps Timetables'] = function () {
+    $m = legacyBoard();
+    check($m->attributes['DefaultApi'] === 'timetables', $m->attributes['DefaultApi']);
+    check(requested('/timetables/v1/'), 'timetables');
+};
+
+$tests['Module: existing instance with a new station keeps Timetables'] = function () {
+    $m = legacyBoard(['Station' => '{"eva":"8099010","name":"WohnortBahnhof Nord"}']);
+    check($m->attributes['DefaultApi'] === 'timetables', $m->attributes['DefaultApi']);
+};
+
+$tests['Module: explicit data source wins'] = function () {
+    legacyBoard(['Api' => 1]);
+    check(requested('/open-boards/v1/'), 'OpenBoards over default Timetables');
+    TestRegistry::reset();
+    $m = makeBoard(['Api' => 2]);
+    check($m->attributes['DefaultApi'] === 'openboards' && requested('/timetables/v1/'), 'Timetables over default OpenBoards');
+};
+
+$tests['Module: switching the data source reloads'] = function () {
+    $m = makeBoard();
+    check(!in_array('ob-re3', array_column(json_decode($m->attributes['Trips'], true), 'id'), true), 'Timetables trips');
+    $m->properties['Api'] = 1;
+    $m->ApplyChanges();
+    check(in_array('ob-re3', array_column(json_decode($m->attributes['Trips'], true), 'id'), true), 'OpenBoards trips');
+};
+
+$tests['Module: extended notes setting'] = function () {
+    $re6 = fn (TestBahntafel $m) => array_values(array_filter($m->testPayload()['rows'], fn ($r) => $r['id'] === 'ob-re6'))[0];
+    check(in_array('Ein Wagen fehlt', $re6(makeBoard(['Api' => 1, 'ExtendedMessages' => true]))['messages'], true), 'on');
+    TestRegistry::reset();
+    check($re6(makeBoard(['Api' => 1]))['messages'] === [], 'off');
+};
+
+$tests['Module: EVA number fills the station list'] = function () {
+    $m = makeBoard(['Api' => 1, 'Station' => '']);
+    check(str_contains(popup($m, fn () => $m->RequestAction('UseEva', '12')), '7-digit'), 'invalid');
+    $m->RequestAction('UseEva', ' 8099001 ');
+    check(in_array(WOHNORT, array_column(lastFormUpdate($m, 'Station'), 'value'), true), 'station offered');
+    TestRegistry::$http = fakeHttp([]);
+    check(str_contains(popup($m, fn () => $m->RequestAction('UseEva', '8099999')), 'No station found'), 'unknown');
+};
+
+$tests['Module: search without OpenStation'] = function () {
+    TestRegistry::$http = fakeHttp(openBoardsRoutes());
+    $m = makeBoard(['Api' => 1]);
+    TestRegistry::$http = fakeHttp(['limit=20' => [401, '']]);
+    check(str_contains(popup($m, fn () => $m->RequestAction('SearchStation', 'WohnortBahnhof')), 'OpenStation'), 'hint');
+};
+
+$tests['Module: search through OpenStation'] = function () {
+    $m = makeBoard(['Api' => 1, 'Station' => '']);
+    $m->RequestAction('SearchStation', 'WohnortBahnhof');
+    check(count(lastFormUpdate($m, 'Station')) === 3, 'none, WohnortBahnhof and Nord');
+};
+
+$tests['Module: data source option shows the default'] = function () {
+    $caption = function (TestBahntafel $m): string {
+        foreach (json_decode($m->GetConfigurationForm(), true)['elements'] as $element) {
+            if (($element['name'] ?? '') === 'Api') {
+                return $element['options'][0]['caption'];
+            }
+        }
+        throw new CheckFailed('no Api select');
+    };
+    check(str_contains($caption(legacyBoard()), 'Timetables'), 'existing');
+    TestRegistry::reset();
+    check(str_contains($caption(makeBoard()), 'OpenBoards'), 'new');
+};
+
+$tests['Module: test connection names the station'] = function () {
+    foreach ([1, 2] as $api) {
+        TestRegistry::reset();
+        $m = makeBoard(['Api' => $api]);
+        check(popup($m, fn () => $m->RequestAction('TestConnection', '')) === 'OK: WohnortBahnhof', "api $api");
+    }
+};

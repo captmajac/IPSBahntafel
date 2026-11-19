@@ -24,7 +24,7 @@ function fakeHttp(array $responses): callable
 // WohnortBahnhof responses of the fixtures (18 and 19 o'clock, changes, station search)
 function wohnortHttp(): callable
 {
-    return fakeHttp([
+    return fakeHttp(openBoardsRoutes() + [
         '/plan/8099001/261104/18' => [200, fixture('plan_wohnort_18.xml')],
         '/plan/8099001/261104/19' => [200, fixture('plan_wohnort_19.xml')],
         '/fchg/8099001'           => [200, fixture('fchg_wohnort.xml')],
@@ -38,26 +38,42 @@ class TestBahntafel extends Bahntafel
 {
     protected function now(): int { return TestRegistry::$now; }
 
-    protected function client(): TimetablesClient
-    {
-        return new TimetablesClient($this->ReadPropertyString('ClientId'), $this->ReadPropertyString('ApiKey'), TestRegistry::$http);
-    }
+    protected function http(): ?callable { return TestRegistry::$http; }
 
     public function testPayload(): array { return $this->payload(); }
 }
 
 const WOHNORT = '{"eva":"8099001","name":"WohnortBahnhof"}';
 
-// Instance 2, configured for WohnortBahnhof unless $props say otherwise
+// Instance 2, configured for WohnortBahnhof with Timetables unless $props say otherwise
 function makeBoard(array $props = []): TestBahntafel
 {
     TestRegistry::$http ??= wohnortHttp();
     $m = new TestBahntafel(2);
     TestRegistry::$objects[2] ??= ['name' => 'Bahntafel', 'type' => 1];  // as Symcon names a new instance
     $m->Create();
+    $m->properties = array_merge($m->properties, ['ClientId' => 'id', 'ApiKey' => 'key', 'Station' => WOHNORT, 'Api' => 2], $props);
+    $m->ApplyChanges();
+    return $m;
+}
+
+// Instance 2 as it was before the module update: it has fetched with Timetables, no DefaultApi yet
+function legacyBoard(array $props = []): TestBahntafel
+{
+    TestRegistry::$http ??= wohnortHttp();
+    $m = new TestBahntafel(2);
+    TestRegistry::$objects[2] ??= ['name' => 'Bahntafel', 'type' => 1];
+    $m->attributes = ['FetchedAt' => TestRegistry::$now - 3600, 'TripsEva' => '8099001', 'Trips' => '[]'];
+    $m->Create();
     $m->properties = array_merge($m->properties, ['ClientId' => 'id', 'ApiKey' => 'key', 'Station' => WOHNORT], $props);
     $m->ApplyChanges();
     return $m;
+}
+
+// URLs requested so far contain $part
+function requested(string $part): bool
+{
+    return TestRegistry::$calls !== [] && array_filter(TestRegistry::$calls, fn ($c) => str_contains($c[0], $part)) === TestRegistry::$calls;
 }
 
 // echo output of an action (popup in the configuration form)
