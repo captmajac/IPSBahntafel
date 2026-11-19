@@ -46,11 +46,10 @@ $tests['Board: changed time wins, delayed only when later, sorted by effective t
 };
 
 $tests['Board: sorted across midnight'] = function () {
-    $trips = TimetablesClient::parsePlan(fixture('plan_wohnort_00.xml'));
-    $trips = array_merge($trips, TimetablesClient::parsePlan(fixture('plan_wohnort_23.xml')));
-    $now = DateTime::createFromFormat('ymdHi', '2611042330', new DateTimeZone('Europe/Berlin'))->getTimestamp();
-    $rows = BoardBuilder::build($trips, $now, settings());
-    check(ids($rows) === ['-7301-2611042358-4', '-7401-2611050003-6'], json_encode(ids($rows)));
+    $now = ts('2611042330');
+    $at = fn (string $id, string $time) => trip($id, 0, ['dep' => ['planned' => ts($time)]]);
+    $rows = BoardBuilder::build([$at('S1 00:03', '2611050003'), $at('RE3 23:58', '2611042358')], $now, settings());
+    check(ids($rows) === ['RE3 23:58', 'S1 00:03'], json_encode(ids($rows)));
 };
 
 $tests['Board: past trips and trips without the board part are left out'] = function () {

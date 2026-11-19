@@ -1,6 +1,6 @@
 # IPSBahntafel
 
-Bibliothek für IP-Symcon mit Bahn-Anzeigen aus der DB OpenBoards API. Bestehende Abos der DB Timetables API funktionieren bis zu deren Abschaltung weiter.
+Bibliothek für IP-Symcon mit Bahn-Anzeigen aus der DB OpenBoards API.
 
 Gedacht für das Tablet zu Hause: „Wann muss ich los?“ und „Wann kommt mein Besuch an?“. Eine Fahrplanauskunft mit Umstiegen ist es nicht.
 
@@ -31,4 +31,4 @@ Die Tests laufen ohne Symcon-Server. Die Kachel lässt sich lokal ansehen:
 ../tools/php/php -S 127.0.0.1:8765
 ```
 
-Danach `http://127.0.0.1:8765/tests/tile-preview.php` öffnen. Echte API-Antworten holen `tests/capture-fixtures.php` (Timetables) und `tests/capture-openboards.php` (OpenBoards, läuft als Skript in IP-Symcon), siehe `tests/fixtures/README.md`.
+Danach `http://127.0.0.1:8765/tests/tile-preview.php` öffnen. Echte API-Antworten holt `tests/capture-openboards.php`, das als Skript in IP-Symcon läuft, siehe `tests/fixtures/README.md`.

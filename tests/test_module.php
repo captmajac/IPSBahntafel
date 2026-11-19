@@ -41,7 +41,7 @@ $tests['Module: without station or credentials no requests and a hint'] = functi
 $tests['Module: configured instance fetches and shows the board'] = function () {
     $m = makeBoard();
     check($m->currentStatus() === 102, 'status');
-    check(count(TestRegistry::$calls) === 4, 'four requests');
+    check(count(TestRegistry::$calls) === 2 && requested('/open-boards/v1/'), 'two requests to OpenBoards');
     check(count(json_decode($m->attributes['Trips'], true)) === 15, 'trips');
     check(str_contains($m->value('BoardHtml'), 'RE6') && str_contains($m->value('BoardHtml'), 'Stand: 04.11.2026 18:00'), 'board');
     check($m->timers['Update']['interval'] === 3600000 && $m->timers['Recalc']['interval'] === 60000, 'timers');
@@ -75,7 +75,7 @@ $tests['Module: no fetch before the kernel is ready'] = function () {
 };
 
 $tests['Module: rejected credentials'] = function () {
-    TestRegistry::$http = fakeHttp(['/18' => [401, ''], '/19' => [401, ''], '/fchg/8099001' => [401, '']]);
+    TestRegistry::$http = fakeHttp(['/departures' => [401, ''], '/arrivals' => [401, '']]);
     $m = makeBoard();
     check($m->currentStatus() === 202, 'status ' . $m->currentStatus());
     check(count(TestRegistry::$log) === 1 && str_contains(TestRegistry::$log[0], 'credentials'), json_encode(TestRegistry::$log));
@@ -84,7 +84,7 @@ $tests['Module: rejected credentials'] = function () {
 $tests['Module: failed update keeps the last board'] = function () {
     $m = makeBoard();
     $trips = $m->attributes['Trips'];
-    TestRegistry::$http = fakeHttp(['/18' => [500, ''], '/19' => [500, '']]);
+    TestRegistry::$http = fakeHttp(['/departures' => [500, ''], '/arrivals' => [500, '']]);
     TestRegistry::$now += 600;
     $m->RequestAction('Update', '');
     check($m->attributes['Trips'] === $trips && $m->attributes['Notice'] === 'failed', 'kept');
@@ -93,18 +93,12 @@ $tests['Module: failed update keeps the last board'] = function () {
 };
 
 $tests['Module: never fetched and API down gives a hint, not an empty box'] = function () {
-    TestRegistry::$http = fakeHttp(['/18' => [503, ''], '/19' => [503, '']]);
+    TestRegistry::$http = fakeHttp(['/departures' => [503, ''], '/arrivals' => [503, '']]);
     $m = makeBoard();
     check($m->attributes['Trips'] === '[]', 'no trips');
     $html = $m->value('BoardHtml');
     check(str_contains($html, 'Aktualisierung fehlgeschlagen') && str_contains($html, 'Keine passenden Züge'), $html);
     check(json_decode(end($m->visu), true)['notice'] === 'failed', 'tile notice');
-};
-
-$tests['Module: plan without realtime'] = function () {
-    TestRegistry::$http = fakeHttp(['/18' => [200, fixture('plan_wohnort_18.xml')], '/19' => [200, fixture('plan_wohnort_19.xml')], '/fchg/8099001' => [500, '']]);
-    $m = makeBoard();
-    check(str_contains($m->value('BoardHtml'), 'ohne Echtzeitdaten'), 'hint');
 };
 
 $tests['Module: stale data when fetching keeps failing'] = function () {
@@ -119,11 +113,11 @@ $tests['Module: switching the board refetches at most every 5 minutes'] = functi
     $m = makeBoard();
     TestRegistry::$now += 300;
     $m->RequestAction('Board', 1);
-    check($m->value('Board') === 1 && count(TestRegistry::$calls) === 8, 'refetched');
+    check($m->value('Board') === 1 && count(TestRegistry::$calls) === 4, 'refetched');
     check(str_contains($m->value('BoardHtml'), 'Löwenstadt Hbf') && json_decode(end($m->visu), true)['board'] === 'arr', 'arrivals');
     TestRegistry::$now += 60;
     $m->RequestAction('Board', 0);
-    check($m->value('Board') === 0 && count(TestRegistry::$calls) === 8, 'throttled');
+    check($m->value('Board') === 0 && count(TestRegistry::$calls) === 4, 'throttled');
     check(json_decode(end($m->visu), true)['board'] === 'dep', 'switched anyway');
 };
 
@@ -131,7 +125,7 @@ $tests['Module: recalc drops departed trains without requests'] = function () {
     $m = makeBoard();
     TestRegistry::$now += 30 * 60;
     $m->RequestAction('Recalc', '');
-    check(count(TestRegistry::$calls) === 4, 'no requests');
+    check(count(TestRegistry::$calls) === 2, 'no requests');
     check(!str_contains($m->value('BoardHtml'), '18:26') && str_contains($m->value('BoardHtml'), '18:51'), 'departed gone');
 };
 
@@ -169,8 +163,8 @@ $tests['Module: station search keeps the current value in the list'] = function 
 $tests['Module: station search without result or with an error says so'] = function () {
     $m = makeBoard();
     check(str_contains(popup($m, fn () => $m->RequestAction('SearchStation', 'Xyz')), 'No station found'), 'none');
-    TestRegistry::$http = fakeHttp(['/station/WohnortBahnhof' => [401, '']]);
-    check(str_contains(popup($m, fn () => $m->RequestAction('SearchStation', 'WohnortBahnhof')), 'credentials'), 'auth');
+    TestRegistry::$http = fakeHttp(['limit=20' => [401, '']]);
+    check(str_contains(popup($m, fn () => $m->RequestAction('SearchStation', 'WohnortBahnhof')), 'OpenStation'), 'no OpenStation subscription');
 };
 
 $tests['Module: route stations from both boards'] = function () {
@@ -188,7 +182,7 @@ $tests['Module: route stations from both boards'] = function () {
 $tests['Module: test connection'] = function () {
     $m = makeBoard();
     check(str_contains(popup($m, fn () => $m->RequestAction('TestConnection', '')), 'OK'), 'ok');
-    TestRegistry::$http = fakeHttp(['/station/8099001' => [401, '']]);
+    TestRegistry::$http = fakeHttp(['/departures' => [401, ''], '/arrivals' => [401, '']]);
     check(str_contains(popup($m, fn () => $m->RequestAction('TestConnection', '')), 'credentials'), 'auth');
 };
 
@@ -236,12 +230,12 @@ $tests['Module: recalc fetches when the loaded window runs out'] = function () {
     $m = makeBoard(['Rows' => 2]);  // 18:00, plan up to 20:00, enough trains
     TestRegistry::$now += 30 * 60;
     $m->RequestAction('Recalc', '');
-    check(count(TestRegistry::$calls) === 4, 'enough left at 18:30');
+    check(count(TestRegistry::$calls) === 2, 'enough left at 18:30');
     TestRegistry::$now += 31 * 60;
     $m->RequestAction('Recalc', '');
-    check(count(TestRegistry::$calls) === 8, 'refetched at 19:01');
+    check(count(TestRegistry::$calls) === 4, 'refetched at 19:01');
     $m->RequestAction('Recalc', '');
-    check(count(TestRegistry::$calls) === 8, 'once');
+    check(count(TestRegistry::$calls) === 4, 'once');
 };
 
 $tests['Module: fetch after Symcon has started'] = function () {
@@ -250,52 +244,18 @@ $tests['Module: fetch after Symcon has started'] = function () {
     check(TestRegistry::$calls === [] && in_array([0, IPS_KERNELSTARTED], $m->messages, true), 'waits for the kernel');
     TestRegistry::$runlevel = KR_READY;
     $m->MessageSink(TestRegistry::$now, 0, IPS_KERNELSTARTED, []);
-    check(count(TestRegistry::$calls) === 4, 'fetched');
-};
-
-$tests['Module: new instance uses OpenBoards'] = function () {
-    $m = makeBoard(['Api' => 0]);
-    check($m->attributes['DefaultApi'] === 'openboards', $m->attributes['DefaultApi']);
-    check(requested('/open-boards/v1/'), json_encode(array_column(TestRegistry::$calls, 0)));
-    check(str_contains($m->value('BoardHtml'), 'RE6'), 'board');
-};
-
-$tests['Module: existing instance keeps Timetables'] = function () {
-    $m = legacyBoard();
-    check($m->attributes['DefaultApi'] === 'timetables', $m->attributes['DefaultApi']);
-    check(requested('/timetables/v1/'), 'timetables');
-};
-
-$tests['Module: existing instance with a new station keeps Timetables'] = function () {
-    $m = legacyBoard(['Station' => '{"eva":"8099010","name":"WohnortBahnhof Nord"}']);
-    check($m->attributes['DefaultApi'] === 'timetables', $m->attributes['DefaultApi']);
-};
-
-$tests['Module: explicit data source wins'] = function () {
-    legacyBoard(['Api' => 1]);
-    check(requested('/open-boards/v1/'), 'OpenBoards over default Timetables');
-    TestRegistry::reset();
-    $m = makeBoard(['Api' => 2]);
-    check($m->attributes['DefaultApi'] === 'openboards' && requested('/timetables/v1/'), 'Timetables over default OpenBoards');
-};
-
-$tests['Module: switching the data source reloads'] = function () {
-    $m = makeBoard();
-    check(!in_array('ob-re3', array_column(json_decode($m->attributes['Trips'], true), 'id'), true), 'Timetables trips');
-    $m->properties['Api'] = 1;
-    $m->ApplyChanges();
-    check(in_array('ob-re3', array_column(json_decode($m->attributes['Trips'], true), 'id'), true), 'OpenBoards trips');
+    check(count(TestRegistry::$calls) === 2, 'fetched');
 };
 
 $tests['Module: extended notes setting'] = function () {
-    $re6 = fn (TestBahntafel $m) => array_values(array_filter($m->testPayload()['rows'], fn ($r) => $r['id'] === 'ob-re6'))[0];
-    check(in_array('Ein Wagen fehlt', $re6(makeBoard(['Api' => 1, 'ExtendedMessages' => true]))['messages'], true), 'on');
+    $re6 = fn (TestBahntafel $m) => array_values(array_filter($m->testPayload()['rows'], fn ($r) => $r['id'] === '-7008-2611041854-3'))[0];
+    check(in_array('Ein Wagen fehlt', $re6(makeBoard(['ExtendedMessages' => true]))['messages'], true), 'on');
     TestRegistry::reset();
-    check($re6(makeBoard(['Api' => 1]))['messages'] === [], 'off');
+    check($re6(makeBoard())['messages'] === [], 'off');
 };
 
 $tests['Module: EVA number fills the station list'] = function () {
-    $m = makeBoard(['Api' => 1, 'Station' => '']);
+    $m = makeBoard(['Station' => '']);
     check(str_contains(popup($m, fn () => $m->RequestAction('UseEva', '12')), '7-digit'), 'invalid');
     $m->RequestAction('UseEva', ' 8099001 ');
     check(in_array(WOHNORT, array_column(lastFormUpdate($m, 'Station'), 'value'), true), 'station offered');
@@ -303,55 +263,19 @@ $tests['Module: EVA number fills the station list'] = function () {
     check(str_contains(popup($m, fn () => $m->RequestAction('UseEva', '8099999')), 'No station found'), 'unknown');
 };
 
-$tests['Module: search without OpenStation'] = function () {
-    TestRegistry::$http = fakeHttp(openBoardsRoutes());
-    $m = makeBoard(['Api' => 1]);
-    TestRegistry::$http = fakeHttp(['limit=20' => [401, '']]);
-    check(str_contains(popup($m, fn () => $m->RequestAction('SearchStation', 'WohnortBahnhof')), 'OpenStation'), 'hint');
-};
-
 $tests['Module: search through OpenStation'] = function () {
-    $m = makeBoard(['Api' => 1, 'Station' => '']);
+    $m = makeBoard(['Station' => '']);
     $m->RequestAction('SearchStation', 'WohnortBahnhof');
     check(count(lastFormUpdate($m, 'Station')) === 3, 'none, WohnortBahnhof and Nord');
 };
 
-$tests['Module: data source option shows the default'] = function () {
-    $caption = function (TestBahntafel $m): string {
-        foreach (json_decode($m->GetConfigurationForm(), true)['elements'] as $element) {
-            if (($element['name'] ?? '') === 'Api') {
-                return $element['options'][0]['caption'];
-            }
-        }
-        throw new CheckFailed('no Api select');
-    };
-    check(str_contains($caption(legacyBoard()), 'Timetables'), 'existing');
-    TestRegistry::reset();
-    check(str_contains($caption(makeBoard()), 'OpenBoards'), 'new');
-};
-
 $tests['Module: test connection names the station'] = function () {
-    foreach ([1, 2] as $api) {
-        TestRegistry::reset();
-        $m = makeBoard(['Api' => $api]);
-        check(popup($m, fn () => $m->RequestAction('TestConnection', '')) === 'OK: WohnortBahnhof', "api $api");
-    }
-};
-
-$tests['Module: existing instance without a successful fetch keeps Timetables'] = function () {
-    TestRegistry::$http = wohnortHttp();
-    $m = new TestBahntafel(2);
-    TestRegistry::$objects[2] ??= ['name' => 'Bahntafel', 'type' => 1];
-    // version 1.0 wrote TripsEva with the station on every ApplyChanges, FetchedAt stays 0 while fetching fails
-    $m->attributes = ['FetchedAt' => 0, 'TripsEva' => '8099001', 'Trips' => '[]'];
-    $m->Create();
-    $m->properties = array_merge($m->properties, ['ClientId' => 'id', 'ApiKey' => 'key', 'Station' => WOHNORT]);
-    $m->ApplyChanges();
-    check($m->attributes['DefaultApi'] === 'timetables', $m->attributes['DefaultApi']);
+    $m = makeBoard();
+    check(popup($m, fn () => $m->RequestAction('TestConnection', '')) === 'OK: WohnortBahnhof', 'name');
 };
 
 $tests['Module: loading the stations keeps the saved route station'] = function () {
-    $m = makeBoard(['Api' => 1, 'RouteStation' => 'Großstadt(Main)Hbf']);
+    $m = makeBoard(['RouteStation' => 'Großstadt(Main)Hbf']);
     $m->RequestAction('LoadStations', '');
     $values = array_column(lastFormUpdate($m, 'RouteStation'), 'value');
     check(in_array('Großstadt(Main)Hbf', $values, true) && in_array('Großstadt Hbf', $values, true), json_encode($values));

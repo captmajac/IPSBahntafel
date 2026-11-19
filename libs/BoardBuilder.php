@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// Departure or arrival board from the trips of TimetablesClient, for a given time; no API calls.
+// Departure or arrival board from the trips of a BoardSource, for a given time; no API calls.
 // settings: board 'dep'|'arr', groups (TrainBadge groups to show), route (station name or ''),
 //           offRoute 'hide'|'grey', rows, walk (minutes, 0 = no reachability), tolerance (minutes),
 //           extended (bool, optional: also the extraMessages)
@@ -58,7 +58,7 @@ class BoardBuilder
         return array_slice($rows, 0, max(1, $settings['rows']));
     }
 
-    // same station in another spelling, e.g. Großstadt(Main)Hbf (Timetables) and Großstadt (Main) Hbf (OpenBoards)
+    // same station in another spelling, e.g. Großstadt(Main)Hbf and Großstadt (Main) Hbf
     public static function sameStation(string $a, string $b): bool
     {
         $key = fn (string $name) => preg_replace('/[^\p{L}\p{N}]/u', '', mb_strtolower($name));

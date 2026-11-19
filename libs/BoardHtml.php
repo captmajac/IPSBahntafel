@@ -111,7 +111,7 @@ class BoardHtml
     // German time like the API, whatever the server's default timezone is
     private static function time(string $format, int $timestamp): string
     {
-        return (new DateTime('@' . $timestamp))->setTimezone(new DateTimeZone(TimetablesClient::TIMEZONE))->format($format);
+        return (new DateTime('@' . $timestamp))->setTimezone(new DateTimeZone(OpenBoardsClient::TIMEZONE))->format($format);
     }
 
     private static function e(string $text): string

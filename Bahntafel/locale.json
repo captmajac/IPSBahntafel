@@ -1,11 +1,6 @@
 {
     "translations": {
         "de": {
-            "Data source": "Datenquelle",
-            "Default": "Standard",
-            "OpenBoards": "OpenBoards",
-            "Timetables (shut down in mid-2027)": "Timetables (Abschaltung Mitte 2027)",
-            "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\"; Timetables only for existing subscriptions)": "Zugang zum DB API Marketplace (APIs „OpenBoards“ und „OpenStation“; Timetables nur mit bestehendem Abo)",
             "Client ID": "Client-ID",
             "API key": "API-Key",
             "Home station: enter a name below under \"Search station\", then choose it here": "Heimatbahnhof: unten bei „Bahnhof suchen“ einen Namen eingeben, dann hier auswählen",
@@ -48,9 +43,9 @@
             "Arrival": "Ankunft",
             "EVA number": "EVA-Nummer",
             "Use EVA number": "EVA-Nummer übernehmen",
-            "Default (%s)": "Standard (%s)",
             "The station search needs a subscription to the API OpenStation. Alternatively enter the EVA number.": "Die Bahnhofssuche braucht ein Abo der API OpenStation. Alternativ die EVA-Nummer eintragen.",
-            "Please enter a 7-digit EVA number": "Bitte eine 7-stellige EVA-Nummer eintragen"
+            "Please enter a 7-digit EVA number": "Bitte eine 7-stellige EVA-Nummer eintragen",
+            "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\")": "Zugang zum DB API Marketplace (APIs „OpenBoards“ und „OpenStation“)"
         }
     }
 }

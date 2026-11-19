@@ -6,7 +6,7 @@ class ApiException extends Exception {}
 
 class ApiAuthException extends ApiException {}
 
-// Source of the trips of one station: DB OpenBoards or DB Timetables.
+// Source of the trips of one station: DB OpenBoards; tests replace it.
 // Trip: ['id', 'line', 'category', 'number', 'type' (OpenBoards transport type or ''),
 //        'dep' => ?Stop, 'arr' => ?Stop, 'messages' => string[] (delay, cancellation, disruption),
 //        'extraMessages' => string[] (quality and notes, only shown on request)]

@@ -1,6 +1,6 @@
 # Bahntafel
 
-Abfahrts- und Ankunftstafel eines festen Heimatbahnhofs aus der DB OpenBoards API (oder der auslaufenden Timetables API), mit Verspätungen, Ausfällen, Gleiswechseln und Hinweisen. Optional lässt sich die Tafel auf eine Richtung einschränken und zeigt dann, ob man einen Zug von zu Hause noch erreicht.
+Abfahrts- und Ankunftstafel eines festen Heimatbahnhofs aus der DB OpenBoards API, mit Verspätungen, Ausfällen, Gleiswechseln und Hinweisen. Optional lässt sich die Tafel auf eine Richtung einschränken und zeigt dann, ob man einen Zug von zu Hause noch erreicht.
 
 ### Inhaltsverzeichnis
 
@@ -11,7 +11,6 @@ Abfahrts- und Ankunftstafel eines festen Heimatbahnhofs aus der DB OpenBoards AP
 5. [Statusvariablen und Visualisierung](#5-statusvariablen-und-visualisierung)
 6. [PHP-Befehlsreferenz](#6-php-befehlsreferenz)
 7. [Aktualisierung und Grenzen](#7-aktualisierung-und-grenzen)
-8. [Umstieg von Timetables auf OpenBoards](#8-umstieg-von-timetables-auf-openboards)
 
 ### 1. Funktionsumfang
 
@@ -64,13 +63,12 @@ Unter der Instanz liegen:
 
 | Einstellung | Bedeutung |
 |---|---|
-| Datenquelle | Standard, OpenBoards oder Timetables. Standard ist bei neuen Instanzen OpenBoards, bei Instanzen aus der Zeit vor OpenBoards Timetables. |
 | Client-ID, API-Key | Zugangsdaten aus dem DB API Marketplace |
 | Bahnhof | Heimatbahnhof, über „Bahnhof suchen“ oder „EVA-Nummer übernehmen“ wählen |
 | Über Bahnhof | Optional: nur Züge, die dort halten (Abfahrt danach, Ankunft davor) |
 | Andere Züge | Ausblenden oder grau darstellen |
 | Züge | Gattungen: Fernverkehr, Regionalverkehr, S-Bahn, Bus, Tram, Sonstige |
-| Erweiterte Hinweise | Auch Hinweise wie „Ein Wagen fehlt“, „Hohe Auslastung“ oder „Heute nur einteilig“ (nur OpenBoards), Standard aus |
+| Erweiterte Hinweise | Auch Hinweise wie „Ein Wagen fehlt“, „Hohe Auslastung“ oder „Heute nur einteilig“, Standard aus |
 | Zeilen auf der Tafel | 1 bis 20, Standard 10 |
 | Wegezeit zum Bahnhof, entspannt | Minuten, 0 schaltet die Erreichbarkeit aus |
 | davon zügig einsparbar | Minuten, die man zügig schneller ist; Züge in dieser Spanne gelten als *knapp* |
@@ -96,19 +94,9 @@ IPS_RequestAction($id, 'Board', 1);     // auf Ankunft umschalten (0 = Abfahrt)
 
 ### 7. Aktualisierung und Grenzen
 
-Die Tafel wird im eingestellten Intervall abgerufen (Standard 60 Minuten). Mit OpenBoards besteht jeder Abruf aus 2 API-Aufrufen: Abfahrts- und Ankunftstafel ab jetzt bis zum Ende der nächsten Stunde, verspätete Züge sind enthalten. Mit Timetables sind es 4 Aufrufe: Fahrplan der vorherigen, aktuellen und nächsten Stunde (die vorherige für verspätete Züge) sowie die Änderungen. Füllen die Züge nach den Filtern die eingestellten Zeilen nicht, lädt das Modul weitere Stunden nach (je Stunde ein weiterer Abruf), höchstens 4 Stunden über die aktuelle hinaus, und beginnt beim nächsten Abruf gleich mit so vielen Stunden. Reichen die geladenen Stunden weniger als eine Stunde voraus, lädt das Modul sofort nach, auch bei längerem Intervall. Beim Umschalten der Anzeige wird zusätzlich abgerufen, höchstens alle 5 Minuten. Restzeit und Erreichbarkeit berechnet das Modul jede Minute neu, dafür ruft es die API nicht ab.
+Die Tafel wird im eingestellten Intervall abgerufen (Standard 60 Minuten). Jeder Abruf besteht aus 2 API-Aufrufen: Abfahrts- und Ankunftstafel ab jetzt bis zum Ende der nächsten Stunde, verspätete Züge sind enthalten. Füllen die Züge nach den Filtern die eingestellten Zeilen nicht, lädt das Modul weitere Stunden nach (je Stunde ein weiterer Abruf), höchstens 4 Stunden über die aktuelle hinaus, und beginnt beim nächsten Abruf gleich mit so vielen Stunden. Reichen die geladenen Stunden weniger als eine Stunde voraus, lädt das Modul sofort nach, auch bei längerem Intervall. Beim Umschalten der Anzeige wird zusätzlich abgerufen, höchstens alle 5 Minuten. Restzeit und Erreichbarkeit berechnet das Modul jede Minute neu, dafür ruft es die API nicht ab.
 
 - Nur Direktverbindungen: Ob ein Zug zur Strecke gehört, ergibt sich aus seinem Laufweg.
 - Vorschau 1 bis 2 Stunden, bei ausgeblendeten Zügen bis zu 5 Stunden.
 - Verspätungen sind höchstens ein Intervall alt.
 - OpenBoards liefert nur Schienenverkehr. Busse und Trams erscheinen damit nicht, Ersatzverkehr der Bahn schon.
-
-### 8. Umstieg von Timetables auf OpenBoards
-
-Die DB löst die Timetables API ab. OpenBoards ist seit November 2026 produktiv, danach laufen beide etwa ein halbes Jahr parallel. Die Abschaltung von Timetables ist für Mitte 2027 angekündigt. Neue Abos für Timetables gibt es nicht mehr.
-
-Instanzen, die schon vor dem Update Daten geladen haben, bleiben bei „Standard (Timetables)“ und laufen unverändert weiter. Zum Umstieg:
-
-1. Im DB API Marketplace dieselbe Anwendung zusätzlich für **OpenBoards** abonnieren, am besten auch für **OpenStation**. Client-ID und API-Key bleiben gleich.
-2. In der Instanz „Datenquelle“ auf **OpenBoards** stellen und übernehmen. Die Tafel lädt sofort neu.
-3. Der gewählte Bahnhof und der „Über Bahnhof“ bleiben erhalten, auch wenn OpenBoards den Namen etwas anders schreibt.

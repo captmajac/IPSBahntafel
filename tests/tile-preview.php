@@ -25,10 +25,7 @@ $samples = [
     'Abfahrt, Wegezeit 20, Strecke grau' => sample(['WalkMinutes' => 20, 'RouteStation' => 'Großstadt Hbf', 'OffRoute' => 1]),
     'Abfahrt, Strecke ausgeblendet'      => sample(['WalkMinutes' => 20, 'RouteStation' => 'Großstadt Hbf']),
     'Ankunft'                            => sample([], null, 1),
-    'Meldung mit Sonderzeichen'          => sample([], fakeHttp([
-        '/18' => [200, fixture('plan_wohnort_18.xml')],
-        '/fchg/8099001' => [200, '<timetable><s id="-7001-2611041801-4"><m t="h" cat="&lt;b&gt;fett&lt;/b&gt; &amp; \'quote\'"/></s></timetable>'],
-    ])),
+    'Meldung mit Sonderzeichen'          => sample([], withMessage("<b>fett</b> & 'quote'")),
     'API ausgefallen'                    => sample([], fakeHttp([])),
     'Nicht eingerichtet'                 => sample(['Station' => '']),
 ];

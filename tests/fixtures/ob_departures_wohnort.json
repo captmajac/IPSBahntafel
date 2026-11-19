@@ -1,576 +1,1354 @@
 {
- "administrations": [],
- "departures": [
-  {
-   "departureId": "ob-re7-departure",
-   "evaNumber": "8099001",
-   "journeyId": "ob-re7",
-   "journeyInfo": {
-    "origin": {
-     "evaNumber": "8099001"
+    "administrations": [],
+    "departures": [
+        {
+            "departureId": "-7001-2611041801-4-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7001-2611041801-4",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099003"
+                },
+                "destination": {
+                    "evaNumber": "8099002"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 83416,
+                "scheduledStartTime": "2026-11-04T18:01:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "NVA",
+                    "categoryInternal": "NVA",
+                    "journeyDescription": "NVA 83416",
+                    "journeyNumber": 83416,
+                    "operationalJourneyNumber": "83416",
+                    "type": "REGIONAL_TRAIN",
+                    "line": {
+                        "name": "RE3"
+                    }
+                }
+            },
+            "time": "2026-11-04T18:01:00+01:00",
+            "timeSchedule": "2026-11-04T18:01:00+01:00",
+            "timeType": "SCHEDULE",
+            "platformSchedule": {
+                "name": "1"
+            },
+            "platform": {
+                "name": "1"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "NVA",
+                "categoryInternal": "NVA",
+                "journeyDescription": "NVA 83416",
+                "journeyNumber": 83416,
+                "operationalJourneyNumber": "83416",
+                "type": "REGIONAL_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Großstadt Hbf"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099002"
+                        }
+                    ]
+                },
+                "via": [],
+                "line": {
+                    "name": "RE3"
+                }
+            },
+            "messages": []
+        },
+        {
+            "departureId": "-7002-2611041806-1-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7002-2611041806-1",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099001"
+                },
+                "destination": {
+                    "evaNumber": "8099007"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 95817,
+                "scheduledStartTime": "2026-11-04T18:06:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "NVB",
+                    "categoryInternal": "NVB",
+                    "journeyDescription": "NVB 95817",
+                    "journeyNumber": 95817,
+                    "operationalJourneyNumber": "95817",
+                    "type": "REGIONAL_TRAIN",
+                    "line": {
+                        "name": "RE7"
+                    }
+                }
+            },
+            "time": "2026-11-04T18:06:00+01:00",
+            "timeSchedule": "2026-11-04T18:06:00+01:00",
+            "timeType": "SCHEDULE",
+            "platformSchedule": {
+                "name": "2"
+            },
+            "platform": {
+                "name": "2"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "NVB",
+                "categoryInternal": "NVB",
+                "journeyDescription": "NVB 95817",
+                "journeyNumber": 95817,
+                "operationalJourneyNumber": "95817",
+                "type": "REGIONAL_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Löwenstadt Hbf"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099007"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099008",
+                        "displayPriority": 1
+                    },
+                    {
+                        "evaNumber": "8099009",
+                        "displayPriority": 2
+                    }
+                ],
+                "line": {
+                    "name": "RE7"
+                }
+            },
+            "messages": [
+                1
+            ],
+            "cancelled": true
+        },
+        {
+            "departureId": "-7003-2611041806-6-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7003-2611041806-6",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099012"
+                },
+                "destination": {
+                    "evaNumber": "8099002"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 34349,
+                "scheduledStartTime": "2026-11-04T18:06:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "SBX",
+                    "categoryInternal": "SBX",
+                    "journeyDescription": "SBX 34349",
+                    "journeyNumber": 34349,
+                    "operationalJourneyNumber": "34349",
+                    "type": "CITY_TRAIN",
+                    "line": {
+                        "name": "S1"
+                    }
+                }
+            },
+            "time": "2026-11-04T18:06:00+01:00",
+            "timeSchedule": "2026-11-04T18:06:00+01:00",
+            "timeType": "REAL",
+            "platformSchedule": {
+                "name": "13"
+            },
+            "platform": {
+                "name": "13"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "SBX",
+                "categoryInternal": "SBX",
+                "journeyDescription": "SBX 34349",
+                "journeyNumber": 34349,
+                "operationalJourneyNumber": "34349",
+                "type": "CITY_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Großstadt Hbf"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099002"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099010",
+                        "displayPriority": 1
+                    },
+                    {
+                        "evaNumber": "8099011",
+                        "displayPriority": 2
+                    }
+                ],
+                "line": {
+                    "name": "S1"
+                }
+            },
+            "messages": []
+        },
+        {
+            "departureId": "-7005-2611041826-5-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7005-2611041826-5",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099002"
+                },
+                "destination": {
+                    "evaNumber": "8099016"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 34751,
+                "scheduledStartTime": "2026-11-04T18:26:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "SBX",
+                    "categoryInternal": "SBX",
+                    "journeyDescription": "SBX 34751",
+                    "journeyNumber": 34751,
+                    "operationalJourneyNumber": "34751",
+                    "type": "CITY_TRAIN",
+                    "line": {
+                        "name": "S2"
+                    }
+                }
+            },
+            "time": "2026-11-04T18:26:00+01:00",
+            "timeSchedule": "2026-11-04T18:26:00+01:00",
+            "timeType": "SCHEDULE",
+            "platformSchedule": {
+                "name": "14"
+            },
+            "platform": {
+                "name": "14"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "SBX",
+                "categoryInternal": "SBX",
+                "journeyDescription": "SBX 34751",
+                "journeyNumber": 34751,
+                "operationalJourneyNumber": "34751",
+                "type": "CITY_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Nordstadt"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099016"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099017",
+                        "displayPriority": 1
+                    },
+                    {
+                        "evaNumber": "8099018",
+                        "displayPriority": 2
+                    },
+                    {
+                        "evaNumber": "8099019",
+                        "displayPriority": 3
+                    }
+                ],
+                "line": {
+                    "name": "S2"
+                }
+            },
+            "messages": []
+        },
+        {
+            "departureId": "-7004-2611041819-4-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7004-2611041819-4",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099002"
+                },
+                "destination": {
+                    "evaNumber": "8099004"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 83419,
+                "scheduledStartTime": "2026-11-04T18:19:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "NVA",
+                    "categoryInternal": "NVA",
+                    "journeyDescription": "NVA 83419",
+                    "journeyNumber": 83419,
+                    "operationalJourneyNumber": "83419",
+                    "type": "REGIONAL_TRAIN",
+                    "line": {
+                        "name": "RE3"
+                    }
+                }
+            },
+            "time": "2026-11-04T18:31:00+01:00",
+            "timeSchedule": "2026-11-04T18:19:00+01:00",
+            "timeType": "PREVIEW",
+            "platformSchedule": {
+                "name": "2"
+            },
+            "platform": {
+                "name": "3"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "NVA",
+                "categoryInternal": "NVA",
+                "journeyDescription": "NVA 83419",
+                "journeyNumber": 83419,
+                "operationalJourneyNumber": "83419",
+                "type": "REGIONAL_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Kreisstadt"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099004"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099006",
+                        "displayPriority": 1
+                    },
+                    {
+                        "evaNumber": "8099005",
+                        "displayPriority": 2
+                    }
+                ],
+                "line": {
+                    "name": "RE3"
+                }
+            },
+            "messages": [
+                2
+            ]
+        },
+        {
+            "departureId": "-7006-2611041837-2-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7006-2611041837-2",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099016"
+                },
+                "destination": {
+                    "evaNumber": "8099002"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 34756,
+                "scheduledStartTime": "2026-11-04T18:37:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "SBX",
+                    "categoryInternal": "SBX",
+                    "journeyDescription": "SBX 34756",
+                    "journeyNumber": 34756,
+                    "operationalJourneyNumber": "34756",
+                    "type": "CITY_TRAIN",
+                    "line": {
+                        "name": "S2"
+                    }
+                }
+            },
+            "time": "2026-11-04T18:41:00+01:00",
+            "timeSchedule": "2026-11-04T18:37:00+01:00",
+            "timeType": "PREVIEW",
+            "platformSchedule": {
+                "name": "11"
+            },
+            "platform": {
+                "name": "11"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "SBX",
+                "categoryInternal": "SBX",
+                "journeyDescription": "SBX 34756",
+                "journeyNumber": 34756,
+                "operationalJourneyNumber": "34756",
+                "type": "CITY_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Großstadt Hbf"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099002"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099010",
+                        "displayPriority": 1
+                    },
+                    {
+                        "evaNumber": "8099011",
+                        "displayPriority": 2
+                    }
+                ],
+                "line": {
+                    "name": "S2"
+                }
+            },
+            "messages": []
+        },
+        {
+            "departureId": "-7011-2611041844-1-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7011-2611041844-1",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099001"
+                },
+                "destination": {
+                    "evaNumber": "8099024"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 100,
+                "scheduledStartTime": "2026-11-04T18:44:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "Bus",
+                    "categoryInternal": "Bus",
+                    "journeyDescription": "Bus 100",
+                    "journeyNumber": 100,
+                    "operationalJourneyNumber": "100",
+                    "type": "BUS",
+                    "line": {
+                        "name": "Bus 100"
+                    }
+                }
+            },
+            "time": "2026-11-04T18:44:00+01:00",
+            "timeSchedule": "2026-11-04T18:44:00+01:00",
+            "timeType": "SCHEDULE",
+            "platformSchedule": {
+                "name": "ZOB"
+            },
+            "platform": {
+                "name": "ZOB"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "Bus",
+                "categoryInternal": "Bus",
+                "journeyDescription": "Bus 100",
+                "journeyNumber": 100,
+                "operationalJourneyNumber": "100",
+                "type": "BUS",
+                "direction": {
+                    "texts": [
+                        "Dorfmitte"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099024"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099025",
+                        "displayPriority": 1
+                    }
+                ],
+                "line": {
+                    "name": "Bus 100"
+                }
+            },
+            "messages": []
+        },
+        {
+            "departureId": "-7007-2611041851-6-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7007-2611041851-6",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099002"
+                },
+                "destination": {
+                    "evaNumber": "8099012"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 34354,
+                "scheduledStartTime": "2026-11-04T18:51:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "SBX",
+                    "categoryInternal": "SBX",
+                    "journeyDescription": "SBX 34354",
+                    "journeyNumber": 34354,
+                    "operationalJourneyNumber": "34354",
+                    "type": "CITY_TRAIN",
+                    "line": {
+                        "name": "S1"
+                    }
+                }
+            },
+            "time": "2026-11-04T18:51:00+01:00",
+            "timeSchedule": "2026-11-04T18:51:00+01:00",
+            "timeType": "SCHEDULE",
+            "platformSchedule": {
+                "name": "11"
+            },
+            "platform": {
+                "name": "11"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "SBX",
+                "categoryInternal": "SBX",
+                "journeyDescription": "SBX 34354",
+                "journeyNumber": 34354,
+                "operationalJourneyNumber": "34354",
+                "type": "CITY_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Südstadt Hbf"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099012"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099015",
+                        "displayPriority": 1
+                    },
+                    {
+                        "evaNumber": "8099014",
+                        "displayPriority": 2
+                    },
+                    {
+                        "evaNumber": "8099013",
+                        "displayPriority": 3
+                    }
+                ],
+                "line": {
+                    "name": "S1"
+                }
+            },
+            "messages": []
+        },
+        {
+            "departureId": "-7008-2611041854-3-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7008-2611041854-3",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099007"
+                },
+                "destination": {
+                    "evaNumber": "8099020"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 95620,
+                "scheduledStartTime": "2026-11-04T18:54:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "NVB",
+                    "categoryInternal": "NVB",
+                    "journeyDescription": "NVB 95620",
+                    "journeyNumber": 95620,
+                    "operationalJourneyNumber": "95620",
+                    "type": "REGIONAL_TRAIN",
+                    "line": {
+                        "name": "RE6"
+                    }
+                }
+            },
+            "time": "2026-11-04T18:54:00+01:00",
+            "timeSchedule": "2026-11-04T18:54:00+01:00",
+            "timeType": "SCHEDULE",
+            "platformSchedule": {
+                "name": "1"
+            },
+            "platform": {
+                "name": "1"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "NVB",
+                "categoryInternal": "NVB",
+                "journeyDescription": "NVB 95620",
+                "journeyNumber": 95620,
+                "operationalJourneyNumber": "95620",
+                "type": "REGIONAL_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Grenzstadt"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099020"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099002",
+                        "displayPriority": 1
+                    },
+                    {
+                        "evaNumber": "8099021",
+                        "displayPriority": 2
+                    },
+                    {
+                        "evaNumber": "8099022",
+                        "displayPriority": 3
+                    },
+                    {
+                        "evaNumber": "8099023",
+                        "displayPriority": 4
+                    }
+                ],
+                "line": {
+                    "name": "RE6"
+                }
+            },
+            "messages": [
+                4,
+                5,
+                6,
+                7,
+                8
+            ]
+        },
+        {
+            "departureId": "-7009-2611041858-5-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7009-2611041858-5",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099002"
+                },
+                "destination": {
+                    "evaNumber": "8099003"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 83421,
+                "scheduledStartTime": "2026-11-04T18:58:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "NVA",
+                    "categoryInternal": "NVA",
+                    "journeyDescription": "NVA 83421",
+                    "journeyNumber": 83421,
+                    "operationalJourneyNumber": "83421",
+                    "type": "REGIONAL_TRAIN",
+                    "line": {
+                        "name": "RE3"
+                    }
+                }
+            },
+            "time": "2026-11-04T18:58:00+01:00",
+            "timeSchedule": "2026-11-04T18:58:00+01:00",
+            "timeType": "SCHEDULE",
+            "platformSchedule": {
+                "name": "2"
+            },
+            "platform": {
+                "name": "2"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "NVA",
+                "categoryInternal": "NVA",
+                "journeyDescription": "NVA 83421",
+                "journeyNumber": 83421,
+                "operationalJourneyNumber": "83421",
+                "type": "REGIONAL_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Oststadt Hbf"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099003"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099006",
+                        "displayPriority": 1
+                    },
+                    {
+                        "evaNumber": "8099005",
+                        "displayPriority": 2
+                    },
+                    {
+                        "evaNumber": "8099004",
+                        "displayPriority": 3
+                    }
+                ],
+                "line": {
+                    "name": "RE3"
+                }
+            },
+            "messages": []
+        },
+        {
+            "departureId": "-7010-2611041859-4-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7010-2611041859-4",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099003"
+                },
+                "destination": {
+                    "evaNumber": "8099002"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 83420,
+                "scheduledStartTime": "2026-11-04T18:59:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "NVA",
+                    "categoryInternal": "NVA",
+                    "journeyDescription": "NVA 83420",
+                    "journeyNumber": 83420,
+                    "operationalJourneyNumber": "83420",
+                    "type": "REGIONAL_TRAIN",
+                    "line": {
+                        "name": "RE3"
+                    }
+                }
+            },
+            "time": "2026-11-04T18:59:00+01:00",
+            "timeSchedule": "2026-11-04T18:59:00+01:00",
+            "timeType": "SCHEDULE",
+            "platformSchedule": {
+                "name": "1"
+            },
+            "platform": {
+                "name": "1"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "NVA",
+                "categoryInternal": "NVA",
+                "journeyDescription": "NVA 83420",
+                "journeyNumber": 83420,
+                "operationalJourneyNumber": "83420",
+                "type": "REGIONAL_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Großstadt Hbf"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099002"
+                        }
+                    ]
+                },
+                "via": [],
+                "line": {
+                    "name": "RE3"
+                }
+            },
+            "messages": []
+        },
+        {
+            "departureId": "-7101-2611041905-6-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7101-2611041905-6",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099012"
+                },
+                "destination": {
+                    "evaNumber": "8099002"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 34355,
+                "scheduledStartTime": "2026-11-04T19:06:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "SBX",
+                    "categoryInternal": "SBX",
+                    "journeyDescription": "SBX 34355",
+                    "journeyNumber": 34355,
+                    "operationalJourneyNumber": "34355",
+                    "type": "CITY_TRAIN",
+                    "line": {
+                        "name": "S1"
+                    }
+                }
+            },
+            "time": "2026-11-04T19:06:00+01:00",
+            "timeSchedule": "2026-11-04T19:06:00+01:00",
+            "timeType": "SCHEDULE",
+            "platformSchedule": {
+                "name": "13"
+            },
+            "platform": {
+                "name": "13"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "SBX",
+                "categoryInternal": "SBX",
+                "journeyDescription": "SBX 34355",
+                "journeyNumber": 34355,
+                "operationalJourneyNumber": "34355",
+                "type": "CITY_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Großstadt Hbf"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099002"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099010",
+                        "displayPriority": 1
+                    },
+                    {
+                        "evaNumber": "8099011",
+                        "displayPriority": 2
+                    }
+                ],
+                "line": {
+                    "name": "S1"
+                }
+            },
+            "messages": []
+        },
+        {
+            "departureId": "-7102-2611041912-1-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7102-2611041912-1",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099028"
+                },
+                "destination": {
+                    "evaNumber": "8099026"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 2000,
+                "scheduledStartTime": "2026-11-04T19:12:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "IC",
+                    "categoryInternal": "IC",
+                    "journeyDescription": "IC 2000",
+                    "journeyNumber": 2000,
+                    "operationalJourneyNumber": "2000",
+                    "type": "INTERCITY_TRAIN"
+                }
+            },
+            "time": "2026-11-04T19:12:00+01:00",
+            "timeSchedule": "2026-11-04T19:12:00+01:00",
+            "timeType": "SCHEDULE",
+            "platformSchedule": {
+                "name": "3"
+            },
+            "platform": {
+                "name": "3"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "IC",
+                "categoryInternal": "IC",
+                "journeyDescription": "IC 2000",
+                "journeyNumber": 2000,
+                "operationalJourneyNumber": "2000",
+                "type": "INTERCITY_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Küstenstadt"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099026"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099002",
+                        "displayPriority": 1
+                    },
+                    {
+                        "evaNumber": "8099027",
+                        "displayPriority": 2
+                    }
+                ]
+            },
+            "messages": []
+        },
+        {
+            "departureId": "-7104-2611041940-3-dep",
+            "evaNumber": "8099001",
+            "journeyId": "-7104-2611041940-3",
+            "journeyInfo": {
+                "origin": {
+                    "evaNumber": "8099001"
+                },
+                "destination": {
+                    "evaNumber": "8099030"
+                },
+                "headerAdministrationId": "80",
+                "headerJourneyNumber": 83120,
+                "scheduledStartTime": "2026-11-04T19:40:00+01:00",
+                "type": "REGULAR",
+                "transportAtStart": {
+                    "administrationId": "80",
+                    "category": "rbx",
+                    "categoryInternal": "rbx",
+                    "journeyDescription": "rbx 83120",
+                    "journeyNumber": 83120,
+                    "operationalJourneyNumber": "83120",
+                    "type": "REGIONAL_TRAIN",
+                    "line": {
+                        "name": "RB10"
+                    }
+                }
+            },
+            "time": "2026-11-04T19:40:00+01:00",
+            "timeSchedule": "2026-11-04T19:40:00+01:00",
+            "timeType": "SCHEDULE",
+            "platformSchedule": {
+                "name": "4"
+            },
+            "platform": {
+                "name": "4"
+            },
+            "transport": {
+                "administrationId": "80",
+                "category": "rbx",
+                "categoryInternal": "rbx",
+                "journeyDescription": "rbx 83120",
+                "journeyNumber": 83120,
+                "operationalJourneyNumber": "83120",
+                "type": "REGIONAL_TRAIN",
+                "direction": {
+                    "texts": [
+                        "Heidestadt"
+                    ],
+                    "stopPlaces": [
+                        {
+                            "evaNumber": "8099030"
+                        }
+                    ]
+                },
+                "via": [
+                    {
+                        "evaNumber": "8099016",
+                        "displayPriority": 1
+                    }
+                ],
+                "line": {
+                    "name": "RB10"
+                }
+            },
+            "messages": []
+        }
+    ],
+    "disruptionCommunications": [],
+    "messages": {
+        "disruptions": [
+            {
+                "messageID": 1,
+                "descriptions": [
+                    {
+                        "language": "deu",
+                        "text": "Bauarbeiten zwischen WohnortBahnhof und Löwenstadt"
+                    }
+                ],
+                "disruptionID": "d-1",
+                "disruptionCommunicationID": "dc-1",
+                "effect": "NO_SERVICE"
+            }
+        ],
+        "risCauseCodes": [
+            {
+                "messageID": 2,
+                "descriptions": [
+                    {
+                        "language": "deu",
+                        "text": "Verspätung eines vorausfahrenden Zuges"
+                    }
+                ],
+                "code": "43"
+            },
+            {
+                "code": "00",
+                "descriptions": [
+                    {
+                        "language": "deu",
+                        "text": "keine Verspätungsbegründung"
+                    }
+                ],
+                "messageID": 8
+            }
+        ],
+        "risQualityDeviations": [
+            {
+                "code": "85",
+                "descriptions": [
+                    {
+                        "language": "deu",
+                        "text": "Ein Wagen fehlt"
+                    }
+                ],
+                "messageID": 4
+            }
+        ],
+        "notes": [
+            {
+                "code": "1000",
+                "descriptions": [
+                    {
+                        "language": "deu",
+                        "text": "Heute nur einteilig."
+                    }
+                ],
+                "messageID": 5
+            },
+            {
+                "disruptionID": "d-lift",
+                "disruptionCommunicationID": "dc-lift",
+                "displayPriority": 60,
+                "descriptions": [
+                    {
+                        "language": "deu",
+                        "text": "Aufzug Gleis 1 außer Betrieb."
+                    }
+                ],
+                "messageID": 6
+            }
+        ],
+        "attributes": [
+            {
+                "code": "FK",
+                "descriptions": [
+                    {
+                        "language": "deu",
+                        "text": "Fahrradmitnahme begrenzt möglich"
+                    }
+                ],
+                "messageID": 7
+            }
+        ]
     },
-    "destination": {
-     "evaNumber": "8099008"
+    "meta": {
+        "consideredStopPlaces": [
+            "8099001"
+        ],
+        "truncatedTransportTypes": []
     },
-    "headerAdministrationId": "80",
-    "headerJourneyNumber": 95817,
-    "scheduledStartTime": "2026-11-04T18:06:00+01:00",
-    "transportAtStart": {
-     "administrationId": "80",
-     "category": "NVB",
-     "categoryInternal": "NVB",
-     "journeyDescription": "NVB 95817",
-     "journeyNumber": 95817,
-     "operationalJourneyNumber": "95817",
-     "type": "REGIONAL_TRAIN",
-     "line": {
-      "name": "RE7"
-     }
-    },
-    "type": "REGULAR"
-   },
-   "time": "2026-11-04T18:06:00+01:00",
-   "timeSchedule": "2026-11-04T18:06:00+01:00",
-   "timeType": "SCHEDULE",
-   "transport": {
-    "administrationId": "80",
-    "category": "NVB",
-    "categoryInternal": "NVB",
-    "journeyDescription": "NVB 95817",
-    "journeyNumber": 95817,
-    "operationalJourneyNumber": "95817",
-    "type": "REGIONAL_TRAIN",
-    "direction": {
-     "texts": [
-      "Löwenstadt Hbf"
-     ],
-     "stopPlaces": [
-      {
-       "evaNumber": "8099008"
-      }
-     ]
-    },
-    "line": {
-     "name": "RE7"
-    },
-    "via": [
-     {
-      "evaNumber": "8099006",
-      "displayPriority": 1
-     },
-     {
-      "evaNumber": "8099007",
-      "displayPriority": 2
-     }
+    "stopPlaces": [
+        {
+            "evaNumber": "8099001",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "WohnortBahnhof"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099002",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Großstadt Hbf"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099003",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Oststadt Hbf"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099004",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Kreisstadt"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099005",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Waldheim"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099006",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Feldheim"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099007",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Löwenstadt Hbf"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099008",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Ostheim"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099009",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Bachdorf"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099010",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Großstadt-Ost"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099011",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Großstadt-Mitte"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099012",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Südstadt Hbf"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099013",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Südheim"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099014",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Mittelfeld"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099015",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Nachbarort"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099016",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Nordstadt"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099017",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Moordorf"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099018",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Burgstadt"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099019",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Heideort"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099020",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Grenzstadt"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099021",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Westheim"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099022",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Flussstadt"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099023",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Weststadt Hbf"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099024",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Dorfmitte"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099025",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Rathaus"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099026",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Küstenstadt"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099027",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Hafenstadt Hbf"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099028",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Messestadt Hbf"
+                }
+            ]
+        },
+        {
+            "evaNumber": "8099030",
+            "localizedNames": [
+                {
+                    "language": "deu",
+                    "name": "Heidestadt"
+                }
+            ]
+        }
     ]
-   },
-   "cancelled": true,
-   "platformSchedule": {
-    "name": "2"
-   },
-   "platform": {
-    "name": "2"
-   },
-   "messages": [
-    2
-   ]
-  },
-  {
-   "departureId": "ob-s1-departure",
-   "evaNumber": "8099001",
-   "journeyId": "ob-s1",
-   "journeyInfo": {
-    "origin": {
-     "evaNumber": "8099002"
-    },
-    "destination": {
-     "evaNumber": "8099014"
-    },
-    "headerAdministrationId": "80",
-    "headerJourneyNumber": 39001,
-    "scheduledStartTime": "2026-11-04T18:06:00+01:00",
-    "transportAtStart": {
-     "administrationId": "80",
-     "category": "SBX",
-     "categoryInternal": "SBX",
-     "journeyDescription": "SBX 39001",
-     "journeyNumber": 39001,
-     "operationalJourneyNumber": "39001",
-     "type": "CITY_TRAIN",
-     "line": {
-      "name": "S1"
-     }
-    },
-    "type": "REGULAR"
-   },
-   "time": "2026-11-04T18:06:00+01:00",
-   "timeSchedule": "2026-11-04T18:06:00+01:00",
-   "timeType": "REAL",
-   "transport": {
-    "administrationId": "80",
-    "category": "SBX",
-    "categoryInternal": "SBX",
-    "journeyDescription": "SBX 39001",
-    "journeyNumber": 39001,
-    "operationalJourneyNumber": "39001",
-    "type": "CITY_TRAIN",
-    "direction": {
-     "texts": [
-      "Oststadt Hbf"
-     ],
-     "stopPlaces": [
-      {
-       "evaNumber": "8099014"
-      }
-     ]
-    },
-    "line": {
-     "name": "S1"
-    },
-    "via": [
-     {
-      "evaNumber": "8099005",
-      "displayPriority": 1
-     }
-    ]
-   },
-   "platformSchedule": {
-    "name": "3"
-   },
-   "platform": {
-    "name": "3"
-   },
-   "messages": []
-  },
-  {
-   "departureId": "ob-re3-departure",
-   "evaNumber": "8099001",
-   "journeyId": "ob-re3",
-   "journeyInfo": {
-    "origin": {
-     "evaNumber": "8099002"
-    },
-    "destination": {
-     "evaNumber": "8099005"
-    },
-    "headerAdministrationId": "80",
-    "headerJourneyNumber": 83419,
-    "scheduledStartTime": "2026-11-04T18:19:00+01:00",
-    "transportAtStart": {
-     "administrationId": "80",
-     "category": "NVA",
-     "categoryInternal": "NVA",
-     "journeyDescription": "NVA 83419",
-     "journeyNumber": 83419,
-     "operationalJourneyNumber": "83419",
-     "type": "REGIONAL_TRAIN",
-     "line": {
-      "name": "RE3"
-     }
-    },
-    "type": "REGULAR"
-   },
-   "time": "2026-11-04T18:31:00+01:00",
-   "timeSchedule": "2026-11-04T18:19:00+01:00",
-   "timeType": "PREVIEW",
-   "transport": {
-    "administrationId": "80",
-    "category": "NVA",
-    "categoryInternal": "NVA",
-    "journeyDescription": "NVA 83419",
-    "journeyNumber": 83419,
-    "operationalJourneyNumber": "83419",
-    "type": "REGIONAL_TRAIN",
-    "direction": {
-     "texts": [
-      "Kreisstadt"
-     ],
-     "stopPlaces": [
-      {
-       "evaNumber": "8099005"
-      }
-     ]
-    },
-    "line": {
-     "name": "RE3"
-    },
-    "via": [
-     {
-      "evaNumber": "8099003",
-      "displayPriority": 1
-     },
-     {
-      "evaNumber": "8099004",
-      "displayPriority": 2
-     }
-    ]
-   },
-   "platformSchedule": {
-    "name": "2"
-   },
-   "platform": {
-    "name": "3"
-   },
-   "messages": [
-    1
-   ]
-  },
-  {
-   "departureId": "ob-re6-departure",
-   "evaNumber": "8099001",
-   "journeyId": "ob-re6",
-   "journeyInfo": {
-    "origin": {
-     "evaNumber": "8099008"
-    },
-    "destination": {
-     "evaNumber": "8099013"
-    },
-    "headerAdministrationId": "80",
-    "headerJourneyNumber": 95620,
-    "scheduledStartTime": "2026-11-04T18:54:00+01:00",
-    "transportAtStart": {
-     "administrationId": "80",
-     "category": "NVB",
-     "categoryInternal": "NVB",
-     "journeyDescription": "NVB 95620",
-     "journeyNumber": 95620,
-     "operationalJourneyNumber": "95620",
-     "type": "REGIONAL_TRAIN",
-     "line": {
-      "name": "RE6"
-     }
-    },
-    "type": "REGULAR"
-   },
-   "time": "2026-11-04T18:54:00+01:00",
-   "timeSchedule": "2026-11-04T18:54:00+01:00",
-   "timeType": "PREVIEW",
-   "transport": {
-    "administrationId": "80",
-    "category": "NVB",
-    "categoryInternal": "NVB",
-    "journeyDescription": "NVB 95620",
-    "journeyNumber": 95620,
-    "operationalJourneyNumber": "95620",
-    "type": "REGIONAL_TRAIN",
-    "direction": {
-     "texts": [
-      "Grenzstadt"
-     ],
-     "stopPlaces": [
-      {
-       "evaNumber": "8099013"
-      }
-     ]
-    },
-    "line": {
-     "name": "RE6"
-    },
-    "via": [
-     {
-      "evaNumber": "8099002",
-      "displayPriority": 1
-     },
-     {
-      "evaNumber": "8099009",
-      "displayPriority": 2
-     },
-     {
-      "evaNumber": "8099011",
-      "displayPriority": 3
-     },
-     {
-      "evaNumber": "8099012",
-      "displayPriority": 4
-     }
-    ]
-   },
-   "platformSchedule": {
-    "name": "1"
-   },
-   "platform": {
-    "name": "1"
-   },
-   "messages": [
-    3,
-    4,
-    5,
-    6,
-    7
-   ]
-  },
-  {
-   "departureId": "ob-ic-departure",
-   "evaNumber": "8099001",
-   "journeyId": "ob-ic",
-   "journeyInfo": {
-    "origin": {
-     "evaNumber": "8099002"
-    },
-    "destination": {
-     "evaNumber": "8099015"
-    },
-    "headerAdministrationId": "80",
-    "headerJourneyNumber": 2000,
-    "scheduledStartTime": "2026-11-04T19:12:00+01:00",
-    "transportAtStart": {
-     "administrationId": "80",
-     "category": "DB",
-     "categoryInternal": "DB",
-     "journeyDescription": "DB 2000",
-     "journeyNumber": 2000,
-     "operationalJourneyNumber": "2000",
-     "type": "INTERCITY_TRAIN"
-    },
-    "type": "REGULAR"
-   },
-   "time": "2026-11-04T19:12:00+01:00",
-   "timeSchedule": "2026-11-04T19:12:00+01:00",
-   "timeType": "SCHEDULE",
-   "transport": {
-    "administrationId": "80",
-    "category": "DB",
-    "categoryInternal": "DB",
-    "journeyDescription": "DB 2000",
-    "journeyNumber": 2000,
-    "operationalJourneyNumber": "2000",
-    "type": "INTERCITY_TRAIN",
-    "direction": {
-     "texts": [
-      "Fernstadt Hbf"
-     ],
-     "stopPlaces": [
-      {
-       "evaNumber": "8099015"
-      }
-     ]
-    }
-   }
-  }
- ],
- "disruptionCommunications": [],
- "messages": {
-  "risCauseCodes": [
-   {
-    "messageID": 1,
-    "code": "43",
-    "descriptions": [
-     {
-      "language": "deu",
-      "text": "Verspätung eines vorausfahrenden Zuges"
-     }
-    ]
-   },
-   {
-    "messageID": 7,
-    "code": "00",
-    "descriptions": [
-     {
-      "language": "deu",
-      "text": "keine Verspätungsbegründung"
-     }
-    ]
-   }
-  ],
-  "disruptions": [
-   {
-    "messageID": 2,
-    "disruptionID": "d-1",
-    "disruptionCommunicationID": "dc-1",
-    "effect": "NO_SERVICE",
-    "displayPriority": 10,
-    "descriptions": [
-     {
-      "language": "deu",
-      "text": "Bauarbeiten zwischen WohnortBahnhof und Löwenstadt",
-      "textShort": "Bauarbeiten"
-     }
-    ]
-   }
-  ],
-  "risQualityDeviations": [
-   {
-    "messageID": 3,
-    "code": "85",
-    "descriptions": [
-     {
-      "language": "deu",
-      "text": "Ein Wagen fehlt"
-     }
-    ]
-   }
-  ],
-  "notes": [
-   {
-    "messageID": 4,
-    "code": "1000",
-    "descriptions": [
-     {
-      "language": "deu",
-      "text": "Heute nur einteilig."
-     }
-    ]
-   },
-   {
-    "messageID": 5,
-    "disruptionID": "d-2",
-    "disruptionCommunicationID": "dc-2",
-    "displayPriority": 60,
-    "descriptions": [
-     {
-      "language": "deu",
-      "text": "Aufzug Gleis 1 außer Betrieb.",
-      "textShort": "Aufzug Gleis 1 außer Betrieb."
-     }
-    ]
-   }
-  ],
-  "attributes": [
-   {
-    "messageID": 6,
-    "code": "FK",
-    "descriptions": [
-     {
-      "language": "deu",
-      "text": "Fahrradmitnahme begrenzt möglich"
-     }
-    ]
-   }
-  ]
- },
- "meta": {
-  "consideredStopPlaces": [
-   "8099001"
-  ],
-  "truncatedTransportTypes": []
- },
- "stopPlaces": [
-  {
-   "evaNumber": "8099001",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "WohnortBahnhof"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099002",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Großstadt Hbf"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099003",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Feldheim"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099004",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Waldheim"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099005",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Kreisstadt"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099006",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Ostheim"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099007",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Bachdorf"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099008",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Löwenstadt Hbf"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099009",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Westheim"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099011",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Flussstadt"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099012",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Weststadt Hbf"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099013",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Grenzstadt"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099014",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Oststadt Hbf"
-    }
-   ]
-  },
-  {
-   "evaNumber": "8099015",
-   "localizedNames": [
-    {
-     "language": "deu",
-     "name": "Fernstadt Hbf"
-    }
-   ]
-  }
- ]
 }

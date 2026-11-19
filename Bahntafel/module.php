@@ -3,14 +3,12 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../libs/BoardSource.php';
-require_once __DIR__ . '/../libs/MessageCodes.php';
 require_once __DIR__ . '/../libs/OpenBoardsClient.php';
-require_once __DIR__ . '/../libs/TimetablesClient.php';
 require_once __DIR__ . '/../libs/TrainBadge.php';
 require_once __DIR__ . '/../libs/BoardBuilder.php';
 require_once __DIR__ . '/../libs/BoardHtml.php';
 
-// Departure and arrival board of one station from the DB OpenBoards or Timetables API, for the WebFront and the tile visualization
+// Departure and arrival board of one station from the DB OpenBoards API, for the WebFront and the tile visualization
 class Bahntafel extends IPSModule
 {
     const STATUS_NOT_CONFIGURED = 201;
@@ -37,8 +35,6 @@ class Bahntafel extends IPSModule
         //Never delete this line!
         parent::Create();
 
-        // 0 default (DefaultApi), 1 OpenBoards, 2 Timetables
-        $this->RegisterPropertyInteger('Api', 0);
         $this->RegisterPropertyString('ClientId', '');
         $this->RegisterPropertyString('ApiKey', '');
         // {"eva": "8099001", "name": "WohnortBahnhof"} or ''
@@ -54,9 +50,7 @@ class Bahntafel extends IPSModule
         $this->RegisterPropertyInteger('IntervalMinutes', 60);
         $this->RegisterPropertyBoolean('ExtendedMessages', false);
 
-        // what the default data source means for this instance: 'openboards' | 'timetables', set once
-        $this->RegisterAttributeString('DefaultApi', '');
-        // trips of BoardSource::fetchTrips, of the data source and station in TripsEva ('openboards:8099001')
+        // trips of BoardSource::fetchTrips, of the station in TripsEva
         $this->RegisterAttributeString('Trips', '[]');
         $this->RegisterAttributeString('TripsEva', '');
         $this->RegisterAttributeInteger('FetchedAt', 0);
@@ -90,14 +84,7 @@ class Bahntafel extends IPSModule
             IPS_SetIcon($this->GetIDForIdent('BoardHtml'), 'clock');
         }
 
-        // before the trips are reset: an instance that has fetched before the update keeps Timetables
-        if ($this->ReadAttributeString('DefaultApi') === '') {
-            // version 1.0 wrote TripsEva on every ApplyChanges with a station, a new instance has none yet
-            $legacy = $this->ReadAttributeInteger('FetchedAt') > 0 || $this->ReadAttributeString('TripsEva') !== '';
-            $this->WriteAttributeString('DefaultApi', $legacy ? 'timetables' : 'openboards');
-        }
-
-        $key = $this->api() . ':' . ($this->station()['eva'] ?? '');
+        $key = $this->station()['eva'] ?? '';
         if ($this->ReadAttributeString('TripsEva') !== $key) {
             $this->WriteAttributeString('Trips', '[]');
             $this->WriteAttributeString('TripsEva', $key);
@@ -132,13 +119,6 @@ class Bahntafel extends IPSModule
             'RouteStation' => array_merge([self::option($this->Translate("(none)"), '')], $route === '' ? [] : [self::option($route, $route)]),
         ];
         $form['elements'] = self::withOptions($form['elements'], $options);
-        foreach ($form['elements'] as &$element) {
-            if (($element['name'] ?? '') === 'Api') {
-                $default = $this->ReadAttributeString('DefaultApi') === 'timetables' ? 'Timetables' : 'OpenBoards';
-                $element['options'][0]['caption'] = sprintf($this->Translate("Default (%s)"), $default);
-            }
-        }
-        unset($element);
         return json_encode($form);
     }
 
@@ -214,18 +194,7 @@ class Bahntafel extends IPSModule
 
     protected function client(): BoardSource
     {
-        $class = $this->api() === 'timetables' ? TimetablesClient::class : OpenBoardsClient::class;
-        return new $class($this->ReadPropertyString('ClientId'), $this->ReadPropertyString('ApiKey'), $this->http());
-    }
-
-    // 'openboards' | 'timetables'
-    private function api(): string
-    {
-        return match ($this->ReadPropertyInteger('Api')) {
-            1       => 'openboards',
-            2       => 'timetables',
-            default => $this->ReadAttributeString('DefaultApi') === 'timetables' ? 'timetables' : 'openboards',
-        };
+        return new OpenBoardsClient($this->ReadPropertyString('ClientId'), $this->ReadPropertyString('ApiKey'), $this->http());
     }
 
     // data of the tile: rows of the chosen board, next train for the small tile, badge SVGs by label
@@ -344,9 +313,7 @@ class Bahntafel extends IPSModule
         try {
             $stations = $pattern === '' ? [] : $this->client()->searchStations($pattern);
         } catch (ApiAuthException $e) {
-            $this->message($this->api() === 'openboards'
-                ? $this->Translate("The station search needs a subscription to the API OpenStation. Alternatively enter the EVA number.")
-                : $this->errorText($e));
+            $this->message($this->Translate("The station search needs a subscription to the API OpenStation. Alternatively enter the EVA number."));
             return;
         } catch (ApiException $e) {
             $this->message($this->errorText($e));
@@ -415,7 +382,7 @@ class Bahntafel extends IPSModule
     private function testConnection(): void
     {
         try {
-            // a board for OpenBoards, a station search for Timetables: the subscription that matters
+            // a board: OpenBoards is the subscription that matters
             $station = $this->client()->stationByEva($this->station()['eva'] ?? '8000105');
             $this->message($station === null ? $this->Translate("No station found") : sprintf($this->Translate("OK: %s"), $station['name']));
         } catch (ApiException $e) {

@@ -13,11 +13,7 @@ $tests['Tile: visualization type and initial data'] = function () {
 };
 
 $tests['Tile: script end tag in API texts does not break the tile'] = function () {
-    TestRegistry::$http = fakeHttp([
-        '/18' => [200, fixture('plan_wohnort_18.xml')],
-        '/19' => [200, fixture('plan_wohnort_19.xml')],
-        '/fchg/8099001' => [200, '<timetable><s id="-7001-2611041801-4"><m t="h" cat="&lt;/script&gt;&lt;b&gt;x"/></s></timetable>'],
-    ]);
+    TestRegistry::$http = withMessage('</script><b>x');
     $m = makeBoard();
     check($m->testPayload()['rows'][0]['messages'] === ['</script><b>x'], 'message in the payload');
     $tile = $m->GetVisualizationTile();

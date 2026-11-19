@@ -1,31 +1,8 @@
 # Test-Fixtures
 
-Stand 2026-11-04: **synthetische** Antworten im Format der DB Timetables API für einen erfundenen Bahnhof „WohnortBahnhof“ (EVA 8099001) mit erfundenen Nachbarbahnhöfen, Linien und Betreibern.
+**Synthetische** Antworten im Format von OpenBoards 1.0.3 und OpenStation (NeTEx) für einen erfundenen Bahnhof „WohnortBahnhof“ (EVA 8099001) mit erfundenen Nachbarbahnhöfen (EVA 8099002 und folgende), Linien und Betreibern.
 
-Echte Antworten holt `tests/capture-fixtures.php <eva>` nach `tests/fixtures/raw/`. Sie werden nicht eingecheckt, weil sie den Bahnhof und damit den Wohnort verraten. Ein Abgleich am 04.11.2026 ergab:
-- Der Aufbau von `plan` und `fchg` entspricht den synthetischen Dateien (zusätzlich ein ungenutztes Attribut `fb`).
-- Meldungen kommen nur als Code: `t="d"` (z. B. 5, 31, 34, 36, 43, 45, 57, 99) und `t="q"` (95, 97). HIM-Meldungen (`t="h"`) mit Text gab es nicht. Code 54 steht nicht in `MessageCodes` und wird weggelassen.
-- `fchg` enthält Stops über viele Stunden. `cp` ist oft gleich dem Sollgleis, `cs="c"` markiert Ausfälle.
-
-Offen: ein Abruf über Mitternacht (Stunde 23 und 00) und die Namenssuche (`station/<name>`, eventuell nur mit `*`).
-
-## Synthetische Antworten
-
-| Datei | Inhalt |
-|---|---|
-| `plan_wohnort_18.xml` | 04.11.2026, 18 Uhr: 10 Züge der Abfahrtstafel aus dem Screenshot und ein Bus 100. RE7 18:06 (`-7002…`) hat nur `dp` (Start in WohnortBahnhof). |
-| `plan_wohnort_19.xml` | 19 Uhr: S1, IC 2000 ohne `l` (Linie aus `c` + `n`), RE7 19:20 nur `ar` (endet in WohnortBahnhof), RB10 (Betreiber `rbx`) nur `dp`. |
-| `plan_wohnort_23.xml`, `plan_wohnort_00.xml` | Mitternacht: RE3 23:58 und S1 00:03 am 05.11. |
-| `fchg_wohnort.xml` | RE3 18:19 (`-7004…`) +12 min auf 18:31, Gleis 3 statt 2, Code 43. RE7 18:06 fällt aus, HIM-Meldung mit `cat`. S2 18:37 +4 min. S1 18:06 mit `ct` = Sollzeit (pünktlich). Ein Stop `-9999…` ohne Plan-Eintrag. RE6 mit Qualitätsmeldung Code 70 (`t="q"`, wird nicht angezeigt). |
-| `station_wohnort.xml` | Suche „WohnortBahnhof“: WohnortBahnhof (8099001) und WohnortBahnhof ZOB. |
-
-Bekannter Trip für Tests: `-7008-2611041854-3`, RE6 (NVB), Abfahrt 18:54 Gleis 1, Ziel Grenzstadt, über Großstadt Hbf.
-
-Meldungen: `t="d"` (Verspätungsgrund) und `t="h"` (HIM, Text in `cat`) werden angezeigt, `t="q"` (Qualität, z. B. WLAN) nicht. Mit echten Antworten prüfen, ob HIM-Meldungen weitere Textattribute haben.
-
-## OpenBoards (Stand 2026-11-19)
-
-Synthetische Antworten im Format von OpenBoards 1.0.3 für denselben „WohnortBahnhof“ und dieselben erfundenen Nachbarn (EVA 8099002 und folgende). Echte Antworten holt `tests/capture-openboards.php`, das als Skript in IP-Symcon läuft und die Zugangsdaten der Instanz nutzt. Es speichert im IP-Symcon-Verzeichnis unter `bahn-capture/`, nie im Repo.
+Echte Antworten holt `tests/capture-openboards.php`, das als Skript in IP-Symcon läuft und die Zugangsdaten der Instanz nutzt. Es speichert im IP-Symcon-Verzeichnis unter `bahn-capture/`, nie im Repo, weil die Antworten den Bahnhof und damit den Wohnort verraten.
 
 Ein Abgleich mit einer echten S-Bahn- und Regionalstation am 19.11.2026 ergab:
 - `via` enthält mit `maxViaStops: 100` alle Zwischenhalte, ohne Herkunft und Ziel. Bei der Ankunft stehen sie vom Bahnhof aus rückwärts, `displayPriority` zählt 1, 2, 3 ….
@@ -35,5 +12,8 @@ Ein Abgleich mit einer echten S-Bahn- und Regionalstation am 19.11.2026 ergab:
 
 | Datei | Inhalt |
 |---|---|
-| `ob_departures_wohnort.json` | RE7 18:06 fällt aus (Störung Bauarbeiten). S1 18:06 pünktlich (`REAL`). RE3 18:19 → 18:31, Gleis 2 → 3, Code 43, entspricht `-7004-2611041819-4` aus den Timetables-Fixtures. RE6 18:54 mit Qualitätshinweis, zugbezogener Notiz, Aufzug-Notiz, Attribut und Code 00. IC 2000 19:12 ohne Linie, Gleis, Via und Meldungen. |
-| `ob_arrivals_wohnort.json` | S1 18:05, RE3 18:18 → 18:30. RE7 19:20 endet hier, Fahrt fällt aus, Herkunft ohne Eintrag in `stopPlaces`. |
+| `ob_departures_wohnort.json` | 04.11.2026, 18 bis 20 Uhr: 14 Abfahrten. RE7 18:06 (`-7002…`) startet hier und fällt aus, Störung „Bauarbeiten …“. S1 18:06 pünktlich (`REAL`). RE3 18:19 (`-7004…`) → 18:31, Gleis 2 → 3, Code 43. S2 18:37 +4 min. Bus 100 (`type` `BUS`). RE6 18:54 (`-7008…`) mit Qualitätshinweis, zugbezogener Notiz, Aufzug-Notiz, Attribut und Code 00. IC 2000 19:12 ohne Linie. RB10 19:40. |
+| `ob_arrivals_wohnort.json` | 12 Ankünfte zu denselben Fahrten, dazu RE7 19:20, der hier endet. |
+| `openstation_wohnort.xml` | Suche „WohnortBahnhof“: WohnortBahnhof (8099001, mit einem Gleis als Quay mit eigener EVA), WohnortBahnhof Nord (8099010) und ein Eintrag ohne EVA. |
+
+Bekannter Trip für Tests: `-7008-2611041854-3`, RE6, Abfahrt 18:54 Gleis 1, Ziel Grenzstadt, über Großstadt Hbf.

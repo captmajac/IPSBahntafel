@@ -21,16 +21,35 @@ function fakeHttp(array $responses): callable
     };
 }
 
-// WohnortBahnhof responses of the fixtures (18 and 19 o'clock, changes, station search)
+function ts(string $yymmddhhii): int
+{
+    return DateTime::createFromFormat('ymdHi', $yymmddhhii, new DateTimeZone('Europe/Berlin'))->getTimestamp();
+}
+
+function tripById(array $trips, string $id): array
+{
+    foreach ($trips as $trip) {
+        if ($trip['id'] === $id) {
+            return $trip;
+        }
+    }
+    throw new CheckFailed("trip $id missing");
+}
+
+// WohnortBahnhof responses of the fixtures (boards 18 to 20 o'clock, station search)
 function wohnortHttp(): callable
 {
-    return fakeHttp(openBoardsRoutes() + [
-        '/plan/8099001/261104/18' => [200, fixture('plan_wohnort_18.xml')],
-        '/plan/8099001/261104/19' => [200, fixture('plan_wohnort_19.xml')],
-        '/fchg/8099001'           => [200, fixture('fchg_wohnort.xml')],
-        '/station/WohnortBahnhof'         => [200, fixture('station_wohnort.xml')],
-        '/station/8099001'        => [200, fixture('station_wohnort.xml')],
-    ]);
+    return fakeHttp(openBoardsRoutes());
+}
+
+// the fixtures with one more disruption text on the first departure (RE3 18:01)
+function withMessage(string $text): callable
+{
+    $board = json_decode(fixture('ob_departures_wohnort.json'), true);
+    $board['messages']['disruptions'][] = ['messageID' => 999, 'disruptionID' => 'd-x', 'disruptionCommunicationID' => 'dc-x', 'effect' => 'UNKNOWN_EFFECT',
+        'descriptions' => [['language' => 'deu', 'text' => $text]]];
+    $board['departures'][0]['messages'][] = 999;
+    return fakeHttp(['/open-boards/v1/departures' => [200, json_encode($board)]] + openBoardsRoutes());
 }
 
 // Module with test clock and fake HTTP (TestRegistry::$http)
@@ -45,25 +64,12 @@ class TestBahntafel extends Bahntafel
 
 const WOHNORT = '{"eva":"8099001","name":"WohnortBahnhof"}';
 
-// Instance 2, configured for WohnortBahnhof with Timetables unless $props say otherwise
+// Instance 2, configured for WohnortBahnhof unless $props say otherwise
 function makeBoard(array $props = []): TestBahntafel
 {
     TestRegistry::$http ??= wohnortHttp();
     $m = new TestBahntafel(2);
     TestRegistry::$objects[2] ??= ['name' => 'Bahntafel', 'type' => 1];  // as Symcon names a new instance
-    $m->Create();
-    $m->properties = array_merge($m->properties, ['ClientId' => 'id', 'ApiKey' => 'key', 'Station' => WOHNORT, 'Api' => 2], $props);
-    $m->ApplyChanges();
-    return $m;
-}
-
-// Instance 2 as it was before the module update: it has fetched with Timetables, no DefaultApi yet
-function legacyBoard(array $props = []): TestBahntafel
-{
-    TestRegistry::$http ??= wohnortHttp();
-    $m = new TestBahntafel(2);
-    TestRegistry::$objects[2] ??= ['name' => 'Bahntafel', 'type' => 1];
-    $m->attributes = ['FetchedAt' => TestRegistry::$now - 3600, 'TripsEva' => '8099001', 'Trips' => '[]'];
     $m->Create();
     $m->properties = array_merge($m->properties, ['ClientId' => 'id', 'ApiKey' => 'key', 'Station' => WOHNORT], $props);
     $m->ApplyChanges();

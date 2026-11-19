@@ -1,14 +1,6 @@
 {
     "elements": [
-        {
-            "type": "Select", "name": "Api", "caption": "Data source",
-            "options": [
-                { "caption": "Default", "value": 0 },
-                { "caption": "OpenBoards", "value": 1 },
-                { "caption": "Timetables (shut down in mid-2027)", "value": 2 }
-            ]
-        },
-        { "type": "Label", "caption": "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\"; Timetables only for existing subscriptions)" },
+        { "type": "Label", "caption": "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\")" },
         { "type": "ValidationTextBox", "name": "ClientId", "caption": "Client ID", "width": "400px" },
         { "type": "PasswordTextBox", "name": "ApiKey", "caption": "API key", "width": "400px" },
         { "type": "Label", "caption": "Home station: enter a name below under \"Search station\", then choose it here" },
