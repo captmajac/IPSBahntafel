@@ -19,7 +19,7 @@ Die DB ersetzt die Timetables API durch die OpenBoards API.
 - Doku-Seite „Open-API Baustein OpenBoards“ auf developer-docs.deutschebahn.com mit Beispielaufruf.
 - OpenAPI-Dokument „OpenStation 1.3.3“ für die Bahnhofssuche.
 - **Migrationshinweise Timetables → OpenBoards habe ich auf keiner der Seiten gefunden.** Die Doku-Seite beschreibt nur OpenBoards selbst. Eine Zuordnung von alt nach neu, Termine oder eine Liste entfallener Felder gibt es dort nicht. Die Zuordnung unten habe ich selbst aus beiden Spezifikationen abgeleitet.
-- Echte OpenBoards-Antworten habe ich noch nicht gesehen. Was nur eine echte Antwort klärt, steht unter „Offene Punkte“.
+- Echte Antworten habe ich am 2026-11-19 ausgewertet, siehe „Ergebnisse aus echten Antworten“.
 
 ## OpenBoards in Kürze
 
@@ -68,8 +68,8 @@ Antwort (`DepartureBoardResponse` bzw. `ArrivalBoardResponse`): eine Liste `depa
 | Meldungen `m@t`: `d` mit Code → `MessageCodes.php`, `h` mit `cat`, `q` verworfen | `messages` mit IDs → `risCauseCodes` (Code **und Klartext**), `disruptions` (Störungen mit Text, Ursache, Auswirkung), `notes` (Freitexte, Bauarbeiten), `risQualityDeviations` (z. B. „WLAN nicht verfügbar“), `attributes`. Dazu Störungen für die ganze Station (`disruptionCommunications`). | **Besser.** Die Verspätungsgründe kommen als Text, `MessageCodes.php` wird für OpenBoards nicht gebraucht. Die Codeliste ist fast dieselbe wie bei Timetables. |
 | **Laufweg** `ppth`: alle folgenden Halte bei der Abfahrt, alle vorherigen bei der Ankunft, als Namen | `transport.via` mit EVA und `displayPriority`; Namen über `stopPlaces`. Herkunft und Ziel stehen in `journeyInfo.origin` / `destination`. | **Größtes Risiko.** Standardmäßig kommen nur 3 Via-Halte nach Priorität. Ob ein hoher `maxViaStops` wirklich **alle** Halte in Fahrtreihenfolge liefert, sagt die Spezifikation nicht. Ohne vollständige Halte funktioniert der Richtungsfilter nur für wichtige Halte. |
 | „weiter nach“ bei der Ankunft: heute Ende des `ppth` der Abfahrt | `journeyInfo.destination` direkt am Ankunftseintrag | **Besser.** Ein Aufruf genügt, die Abfahrtstafel wird dafür nicht gebraucht. |
-| Linie `l` (z. B. `RE3`, `S1`, `3`) | `transport.line.name` (Text für Fahrgäste), dazu `journeyDescription` | Das Format ist offen, z. B. `RE 3` oder `RE3` → `TrainBadge` prüfen |
-| Kategorie `tl@c`, Nummer `tl@n` | `transport.category` (externe Gattung), `journeyNumber`, dazu `type` (`HIGH_SPEED_TRAIN` … `BUS`, `TRAM`) | **Besser.** Mit `type` lässt sich die Gruppe zuordnen, ohne Muster im Namen zu raten |
+| Linie `l` (z. B. `RE3`, `S1`, `3`) | `transport.line.name`, in echten Antworten kompakt (`S7`, `RE30`) | gleichwertig |
+| Kategorie `tl@c`, Nummer `tl@n` | `transport.category` (in echten Antworten der Betreiber-Code, z. B. `ENO`), `journeyNumber`, dazu `type` (`HIGH_SPEED_TRAIN` … `BUS`, `TRAM`) | **Besser.** Mit `type` lässt sich die Gruppe zuordnen, ohne Muster im Namen zu raten |
 | Fahrt-ID `s@id` | `journeyId` (dazu `departureId` / `arrivalId`, `dfid`) | gleichwertig. Abfahrt und Ankunft derselben Fahrt haben dieselbe `journeyId`. |
 | Auth `DB-Client-Id` / `DB-Api-Key` | dieselben Header | gleich. Vermutlich reicht es, die bestehende Anwendung zusätzlich für OpenBoards zu abonnieren (noch nicht geprüft). |
 | Rate-Limit | 10 Aufrufe pro Sekunde | unkritisch, das Modul braucht höchstens ein paar Aufrufe pro Stunde |
@@ -117,9 +117,9 @@ Erst OpenBoards versuchen, bei 401/403 Timetables.
   - `changed` ← `time`, wenn `timeType` nicht `SCHEDULE` ist, sonst `null`
   - `platform` ← `platformSchedule.name`, `changedPlatform` ← `platform.name`
   - `cancelled` ← `cancelled` oder `journeyInfo.journeyCancelled`
-  - `path`: bei der Abfahrt die Via-Namen und dann das Ziel, bei der Ankunft die Herkunft und dann die Via-Namen. Die Namen kommen aus `stopPlaces`, ohne doppelte Einträge.
+  - `path`: bei der Abfahrt die Via-Namen und dann das Ziel aus `journeyInfo.destination`, bei der Ankunft die Herkunft aus `journeyInfo.origin` und dann die Via-Namen. `BoardBuilder` braucht nur den ersten bzw. letzten Eintrag und die Menge der Halte, nicht die Reihenfolge dazwischen. Die Namen kommen aus `stopPlaces`, ohne doppelte Einträge.
 - Trip: `id` ← `journeyId`. `line` ← `transport.line.name`, ohne Linie `category journeyNumber`. `category` ← `transport.category`, `number` ← `journeyNumber`.
-- `messages`: Texte der Meldungs-IDs des Halts. Übernommen werden `risCauseCodes` außer Code `00`, `disruptions` (kurzer Text) und `notes`. Qualitätsabweichungen und Attribute bleiben weg, wie heute `q`. Doppelte Texte fallen raus. „Verspätung“ ohne Grund ergänzt weiter `BoardBuilder`.
+- `messages`: Texte der Meldungs-IDs des Halts. Übernommen werden `risCauseCodes` außer Code `00`, `disruptions` (kurzer Text) und zugbezogene `notes`. `attributes` bleiben weg. Ob `risQualityDeviations` und Bahnhofs-Hinweise auf die Tafel kommen, entscheidet der zweite Lauf. Doppelte Texte fallen raus. „Verspätung“ ohne Grund ergänzt weiter `BoardBuilder`.
 - `realtime` ist immer `true`, weil Soll und Echtzeit aus derselben Antwort kommen. Scheitert der Aufruf, gibt es eine `ApiException`. 401/403 ergeben eine `ApiAuthException`. Antwortet 404 bei beiden Tafeln, gibt es eine `ApiException` „keine Tafel für Station“ wie heute.
 - `searchStations($pattern)`: `GET open-station/v1/netex?stopPlaceName=…&limit=20`. Aus dem NeTEx-XML kommen `StopPlace` → `Name` und `KeyValue` `EVA`. Treffer ohne EVA werden übersprungen. Fehlt das OpenStation-Abo (401/403), meldet das Modul „Bahnhofssuche braucht das Abo OpenStation“. Die Tafel selbst funktioniert trotzdem, wenn die Station schon gewählt ist.
 - HTTP läuft wie heute über ein injizierbares `$http`, jetzt mit Methode und Body für POST. Darüber laufen die Tests ohne Netz.
@@ -132,7 +132,7 @@ Erst OpenBoards versuchen, bei 401/403 Timetables.
 - „Verbindung testen“ ruft bei OpenBoards eine Abfahrtstafel ab, weil das das Abo ist, auf das es ankommt. Bei Timetables bleibt es wie heute.
 - **Richtungsfilter:** `BoardBuilder` vergleicht den „Über Bahnhof“ mit den Halten des Laufwegs normalisiert: Kleinbuchstaben, ohne Leerzeichen und Satzzeichen. `Frankfurt(Main)Hbf` passt dann auf `Frankfurt (Main) Hbf`. Ein gespeicherter Wert überlebt den Wechsel der Datenquelle, ohne dass der Nutzer neu wählt.
 - Nach einem Wechsel der Datenquelle verwirft das Modul die geladenen Trips und lädt neu.
-- Gruppen: `TrainBadge::group` bekommt optional `type` aus OpenBoards (`HIGH_SPEED_TRAIN`/`INTERCITY_TRAIN` → lang, `REGIONAL_TRAIN`/`INTER_REGIONAL_TRAIN` → regional, `CITY_TRAIN` → S-Bahn). Ohne `type` gelten die bisherigen Muster. Dafür bekommt der Trip ein zusätzliches Feld `type` (bei Timetables `''`).
+- Gruppen: `TrainBadge::group` bekommt optional `type` aus OpenBoards, das bei OpenBoards Vorrang vor den Mustern hat (`HIGH_SPEED_TRAIN`/`INTERCITY_TRAIN` → lang, `REGIONAL_TRAIN`/`INTER_REGIONAL_TRAIN` → regional, `CITY_TRAIN` → S-Bahn). Ohne `type` gelten die bisherigen Muster. Dafür bekommt der Trip ein zusätzliches Feld `type` (bei Timetables `''`).
 
 ### Doku
 
@@ -152,17 +152,17 @@ Erst OpenBoards versuchen, bei 401/403 Timetables.
 
 `TimetablesClient`, `MessageCodes.php`, die Timetables-Fixtures und die Auswahl „Datenquelle“ entfallen. Die Eigenschaft `Api` bleibt registriert, damit gespeicherte Konfigurationen gültig bleiben, und wird ignoriert.
 
-## Offene Punkte, die eine echte Antwort klären muss
+## Ergebnisse aus echten Antworten (2026-11-19)
 
-Vor der Implementierung brauche ich je eine echte Abfahrts- und Ankunftstafel eines Bahnhofs (gespeichert in `tests/fixtures/raw/`, nicht committet). Daran prüfe ich:
+Abfrage einer S-Bahn- und Regionalstation mit `tests/capture-openboards.php` als IP-Symcon-Skript: 37 Abfahrten und 37 Ankünfte in 4 Stunden.
 
-1. Liefert `maxViaStops: 100` alle Halte in Fahrtreihenfolge, oder nur priorisierte? Bei der Ankunft die vorherigen Halte? Sind Herkunft und Ziel in `via` enthalten?
-2. Format von `line.name` und `category` (`RE 3` oder `RE3`, `S 1`, ICE ohne Linie?).
-3. Filtert `timeWindow` nach Soll- oder nach bester Zeit? Davon hängt ab, ob die Stunde Vorlauf für Verspätete nötig ist.
-4. Funktionieren die bestehenden Zugangsdaten nach einem zusätzlichen Abo für OpenBoards?
-5. Ist OpenStation kostenlos abonnierbar, und liefert die Namenssuche die EVA zuverlässig?
-
-Ergibt Punkt 1, dass der Laufweg unvollständig ist, kommt das Thema vor der Implementierung noch einmal auf den Tisch. Dann bliebe der Richtungsfilter auf die gelieferten Via-Halte beschränkt, oder es braucht eine weitere API für den Laufweg.
+1. **Laufweg vollständig.** Mit `maxViaStops: 100` kommen alle Zwischenhalte, auch 18 bei einem langen RE. Mit dem Standard 3 kommt nur die Hälfte der Halte (177 gegen 93). Bei der Abfahrt enthält `via` die folgenden Halte, bei der Ankunft die vorherigen. Herkunft und Ziel sind nicht enthalten, sie kommen aus `journeyInfo`. Ein Zug ohne Zwischenhalt hat ein leeres `via`. Bei der Ankunft stehen die Halte ab dem Heimatbahnhof rückwärts. Das Design nutzt die Reihenfolge darum nicht: Herkunft und Ziel kommen aus `journeyInfo`, der Richtungsfilter prüft nur, ob der Halt enthalten ist.
+2. **`line.name`** ist kompakt wie bei Timetables (`S7`, `RE30`). **`category` ist der Betreiber-Code** (z. B. `SBH`, `ENO`, `WFB`), nicht die Gattung. Die Gruppe kommt darum aus `type`. Die bisherige Betreiber-Anzeige (`operator`, wenn die Linie nicht mit der Kategorie beginnt) funktioniert weiter. Einen ICE ohne Linie enthielt die Stichprobe nicht, der Rückfall `category journeyNumber` bleibt.
+3. **Zeitfenster:** Unklar. Kein Zug lag in der Stichprobe über dem Fensterbeginn. Die Stunde Vorlauf bleibt, sie kostet keinen zusätzlichen Aufruf. Der zweite Lauf prüft es gezielt.
+4. **Zugangsdaten:** Die bestehende Anwendung mit zusätzlichem OpenBoards-Abo funktioniert mit denselben Client-ID und API-Key. Bestandsnutzer müssen nur abonnieren und umschalten.
+5. **OpenStation:** 401 ohne eigenes Abo. Offen, ob es kostenlos ist.
+6. **Meldungen:** `attributes` (z. B. „Fahrradmitnahme begrenzt möglich“, „Rollstuhlstellplatz“) hängen an fast jedem Zug und bleiben weg. `risQualityDeviations` liefern nützliche Hinweise wie „Ein Wagen fehlt“ oder „Hohe Auslastung“. Manche `notes` gelten für den Bahnhof (Aufzug außer Betrieb) und hängen an jedem Zug, andere sind zugbezogen („Heute nur einteilig“, Code `1000`). Woran man beides unterscheidet, klärt der zweite Lauf.
+7. Abfahrt und Ankunft derselben Fahrt haben dieselbe `journeyId`. Das Zusammenführen funktioniert.
 
 ## Nicht Teil dieser Umstellung
 

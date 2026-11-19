@@ -105,9 +105,9 @@ foreach (['ob_departures' => 'departures', 'ob_arrivals' => 'arrivals'] as $name
     }
     $map = $names($response);
     echo "\n== $name: " . count($response[$key]) . " entries\n";
-    foreach (array_slice($response[$key], 0, 12) as $entry) {
+    foreach (array_slice($response[$key], 0, 6) as $entry) {
         $t = $entry['transport'];
-        $via = array_map(fn ($v) => $map[$v['evaNumber']] ?? $v['evaNumber'], $t['via'] ?? []);
+        $via = array_map(fn ($v) => ($map[$v['evaNumber']] ?? $v['evaNumber']) . '(' . $v['displayPriority'] . ')', $t['via'] ?? []);
         $origin = $map[$entry['journeyInfo']['origin']['evaNumber']] ?? '?';
         $destination = $map[$entry['journeyInfo']['destination']['evaNumber']] ?? '?';
         printf(
@@ -139,12 +139,32 @@ if ($data['ob_departures'] !== null && $data['ob_departures_via3'] !== null) {
     echo "\n== via stops in total: maxViaStops 100 = " . $count($data['ob_departures']) . ", maxViaStops 3 = " . $count($data['ob_departures_via3']) . "\n";
 }
 
-if ($data['ob_departures_fromnow'] !== null) {
-    $start = $now;
-    $early = array_filter($data['ob_departures_fromnow']['departures'], fn ($e) => strtotime($e['timeSchedule']) < $start);
-    echo "\n== window from now: " . count($data['ob_departures_fromnow']['departures']) . " entries, " . count($early) . " of them planned before the start\n";
-    foreach ($early as $e) {
-        echo '   planned ' . substr($e['timeSchedule'], 11, 5) . ', now ' . substr($e['time'], 11, 5) . ' ' . $e['timeType'] . "\n";
+// delayed across the start of the window: planned before now, best time after it; are they in the window from now?
+if ($data['ob_departures'] !== null && $data['ob_departures_fromnow'] !== null) {
+    $fromNow = array_column($data['ob_departures_fromnow']['departures'], 'journeyId');
+    echo "\n== window from now (" . date('H:i', $now) . "): " . count($fromNow) . " entries\n";
+    foreach ($data['ob_departures']['departures'] as $e) {
+        if (strtotime($e['timeSchedule']) < $now && strtotime($e['time']) >= $now) {
+            echo '   planned ' . substr($e['timeSchedule'], 11, 5) . ', now ' . substr($e['time'], 11, 5) . ': '
+                . (in_array($e['journeyId'], $fromNow, true) ? 'included' : 'MISSING') . "\n";
+        }
+    }
+}
+
+// notes and disruptions: train-specific or the same for every train?
+foreach (['ob_departures' => 'departures', 'ob_arrivals' => 'arrivals'] as $name => $key) {
+    $response = $data[$name];
+    if ($response === null) {
+        continue;
+    }
+    $used = array_count_values(array_merge(...array_map(fn ($e) => $e['messages'] ?? [], $response[$key])));
+    echo "\n== $name messages (" . count($response[$key]) . " entries), board-level: " . json_encode($response['disruptionCommunications'] ?? []) . "\n";
+    foreach (['notes', 'disruptions', 'risQualityDeviations'] as $kind) {
+        foreach ($response['messages'][$kind] ?? [] as $m) {
+            $fields = $m;
+            unset($fields['descriptions']);
+            printf("   %s on %d: %s %s\n", $kind, $used[$m['messageID']] ?? 0, json_encode($fields, JSON_UNESCAPED_UNICODE), mb_substr(json_encode($m['descriptions'][0] ?? null, JSON_UNESCAPED_UNICODE), 0, 120));
+        }
     }
 }
 
