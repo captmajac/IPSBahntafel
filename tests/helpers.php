@@ -74,6 +74,7 @@ function openBoardsRoutes(): array
     return [
         '/open-boards/v1/departures' => [200, fixture('ob_departures_wohnort.json')],
         '/open-boards/v1/arrivals'   => [200, fixture('ob_arrivals_wohnort.json')],
+        '/open-station/v1/netex?stopPlaceName=WohnortBahnhof&limit=20' => [200, fixture('openstation_wohnort.xml')],
     ];
 }
 

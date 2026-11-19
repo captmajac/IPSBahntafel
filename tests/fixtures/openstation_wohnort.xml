@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:ns2="http://www.opengis.net/gml/3.2" version="1">
+    <PublicationTimestamp>2026-11-19T00:00:00.000Z</PublicationTimestamp>
+    <ParticipantRef>DB</ParticipantRef>
+    <dataObjects>
+        <CompositeFrame version="1" id="test:CompositeFrame:1">
+            <frames>
+                <SiteFrame version="1" id="test:SiteFrame:1">
+                    <stopPlaces>
+                        <StopPlace version="1" id="dhid:de:00000:8099001">
+                            <keyList>
+                                <KeyValue><Key>NORMALIZED_ID_URI</Key><Value>https://id.example/8099001</Value></KeyValue>
+                                <KeyValue><Key>EVA</Key><Value>8099001</Value></KeyValue>
+                            </keyList>
+                            <Name lang="de">WohnortBahnhof</Name>
+                            <quays>
+                                <Quay version="1" id="dhid:de:00000:8099001:1">
+                                    <keyList><KeyValue><Key>EVA</Key><Value>8099991</Value></KeyValue></keyList>
+                                    <Name lang="de">Gleis 1</Name>
+                                </Quay>
+                            </quays>
+                        </StopPlace>
+                        <StopPlace version="1" id="dhid:de:00000:8099010">
+                            <keyList>
+                                <KeyValue><Key>EVA</Key><Value>8099010</Value></KeyValue>
+                            </keyList>
+                            <Name lang="de">WohnortBahnhof Nord</Name>
+                        </StopPlace>
+                        <StopPlace version="1" id="dhid:de:00000:9999">
+                            <keyList>
+                                <KeyValue><Key>RIL</Key><Value>XWB</Value></KeyValue>
+                            </keyList>
+                            <Name lang="de">WohnortBahnhof Werkstatt</Name>
+                        </StopPlace>
+                    </stopPlaces>
+                </SiteFrame>
+            </frames>
+        </CompositeFrame>
+    </dataObjects>
+</PublicationDelivery>

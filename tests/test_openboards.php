@@ -106,3 +106,26 @@ $tests['OpenBoards: rows like Timetables'] = function () {
         check($row(tripById(obTrips(), 'ob-re3'), $board) === $row(tripById($timetables, '-7004-2611041819-4'), $board), $board);
     }
 };
+
+$tests['OpenStation: search gives eva and name'] = function () {
+    $stations = (new OpenBoardsClient('id', 'key', openBoardsHttp()))->searchStations('WohnortBahnhof');
+    check($stations === [['eva' => '8099001', 'name' => 'WohnortBahnhof'], ['eva' => '8099010', 'name' => 'WohnortBahnhof Nord']], json_encode($stations));
+    check(str_ends_with(TestRegistry::$calls[0][0], '/open-station/v1/netex?stopPlaceName=WohnortBahnhof&limit=20'), TestRegistry::$calls[0][0]);
+    check(TestRegistry::$calls[0][2] === null, 'GET');
+    check((new OpenBoardsClient('id', 'key', openBoardsHttp()))->searchStations('Nirgendwo') === [], 'nothing found');
+};
+
+$tests['OpenStation: without subscription'] = function () {
+    try {
+        (new OpenBoardsClient('id', 'key', fakeHttp(['limit=20' => [401, '']])))->searchStations('WohnortBahnhof');
+        check(false, 'no exception');
+    } catch (ApiAuthException $e) {
+    }
+};
+
+$tests['OpenBoards: station by eva'] = function () {
+    $client = new OpenBoardsClient('id', 'key', openBoardsHttp());
+    check($client->stationByEva('8099001', ts('2611041800')) === ['eva' => '8099001', 'name' => 'WohnortBahnhof'], 'found');
+    check(json_decode(TestRegistry::$calls[0][2], true)['timeWindow'] === ['timeStart' => '2026-11-04T18:00:00+01:00', 'timeEnd' => '2026-11-04T18:30:00+01:00'], 'window');
+    check((new OpenBoardsClient('id', 'key', fakeHttp([])))->stationByEva('8099999') === null, 'unknown');
+};
