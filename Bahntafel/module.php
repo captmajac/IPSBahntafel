@@ -305,8 +305,18 @@ class Bahntafel extends IPSModule
     private function searchStation(string $pattern): void
     {
         try {
-            $stations = $pattern === '' ? [] : $this->client()->searchStations($pattern);
+            if (preg_match('/^\d{7}$/', $pattern) === 1) {
+                // an EVA number: a board knows the name, no OpenStation needed
+                $station = $this->client()->stationByEva($pattern);
+                $stations = $station === null ? [] : [$station];
+            } else {
+                $stations = $pattern === '' ? [] : $this->client()->searchStations($pattern);
+            }
         } catch (ApiAuthException $e) {
+            if (preg_match('/^\d{7}$/', $pattern) === 1) {
+                $this->message($this->errorText($e));
+                return;
+            }
             $this->message($this->Translate("The station search needs a subscription to the API OpenStation in the DB API Marketplace."));
             return;
         } catch (ApiException $e) {

@@ -23,7 +23,7 @@ Abfahrts- und Ankunftstafel eines festen Heimatbahnhofs aus der DB OpenBoards AP
 ### 2. Voraussetzungen
 
 - IP-Symcon ab 9.0
-- Kostenloses Konto im [DB API Marketplace](https://developers.deutschebahn.com/) mit einer Anwendung, die die API **OpenBoards** abonniert hat. Dazu die API **OpenStation** für die Bahnhofssuche.
+- Kostenloses Konto im [DB API Marketplace](https://developers.deutschebahn.com/) mit einer Anwendung, die die API **OpenBoards** abonniert hat. Dazu die API **OpenStation** für die Suche nach Namen, die Suche nach EVA-Nummer geht auch ohne.
 
 ### Zugang zur DB API
 
@@ -47,7 +47,7 @@ Kompatibilität: alle Bahnhöfe in Deutschland, die die DB API kennt. Die Tafel 
 Unter *Instanz hinzufügen* die Instanz *Bahntafel* auswählen. Für mehrere Bahnhöfe legt man mehrere Instanzen an.
 
 1. Client-ID und API-Key eintragen.
-2. Bei „Bahnhof suchen“ den Namen eingeben (z. B. `WohnortBahnhof`) und „Suchen“ klicken. Der erste Treffer steht dann direkt darunter unter „Bahnhof“. Passt er nicht, dort einen anderen Treffer wählen. Dann übernehmen.
+2. Bei „Bahnhofsname oder EVA-Nummer“ den Namen (z. B. `WohnortBahnhof`) oder die 7-stellige EVA-Nummer eingeben und „Suchen“ klicken. Der erste Treffer steht dann direkt darunter unter „Bahnhof“. Passt er nicht, dort einen anderen Treffer wählen. Dann übernehmen.
 3. Optional die Richtung festlegen: unter „Über Bahnhof“ z. B. `Großstadt Hbf` wählen. Die Liste enthält die Bahnhöfe der zuletzt geladenen Züge, sie ist also erst nach dem ersten Abruf gefüllt. Bei „Andere Züge“ entscheidest du, ob Züge, die nicht an diesem Bahnhof halten, ausgeblendet oder grau dargestellt werden. Ausgeblendete Züge verkürzen die Tafel nicht, das Modul lädt dann weitere Stunden.
    - Abfahrt: Züge, die danach an dem Bahnhof halten.
    - Ankunft: Züge, die vorher an dem Bahnhof gehalten haben. Die Tafel zeigt dann, woher der Zug kommt und wohin er weiterfährt.
@@ -64,7 +64,7 @@ Unter der Instanz liegen:
 | Einstellung | Bedeutung |
 |---|---|
 | Client-ID, API-Key | Zugangsdaten aus dem DB API Marketplace |
-| Bahnhof | Heimatbahnhof, über „Bahnhof suchen“ wählen |
+| Bahnhof | Heimatbahnhof, über die Suche nach Name oder EVA-Nummer wählen |
 | Über Bahnhof | Optional: nur Züge, die dort halten (Abfahrt danach, Ankunft davor) |
 | Andere Züge | Ausblenden oder grau darstellen |
 | Züge | Gattungen: Fernverkehr, Regionalverkehr, S-Bahn, Bus, Tram, Sonstige |

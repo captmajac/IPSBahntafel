@@ -304,3 +304,13 @@ $tests['Module: without OpenStation the search says so'] = function () {
     $text = popup($m, fn () => $m->RequestAction('SearchStation', 'WohnortBahnhof'));
     check(str_contains($text, 'OpenStation') && !str_contains($text, 'EVA'), $text);
 };
+
+$tests['Module: search by EVA number, without OpenStation'] = function () {
+    $m = makeBoard(['Station' => '']);
+    TestRegistry::$http = fakeHttp(['limit=20' => [401, '']] + openBoardsRoutes());
+    $m->RequestAction('SearchStation', ' 8099001 ');
+    check(in_array(['Station', 'value', WOHNORT], $m->formUpdates, true), 'WohnortBahnhof selected');
+    check(!requested('open-station'), 'no OpenStation request');
+    TestRegistry::$http = fakeHttp([]);
+    check(str_contains(popup($m, fn () => $m->RequestAction('SearchStation', '8099999')), 'No station found'), 'unknown');
+};

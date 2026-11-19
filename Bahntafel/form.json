@@ -3,11 +3,11 @@
         { "type": "Label", "caption": "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\")" },
         { "type": "ValidationTextBox", "name": "ClientId", "caption": "Client ID", "width": "400px" },
         { "type": "PasswordTextBox", "name": "ApiKey", "caption": "API key", "width": "400px" },
-        { "type": "Label", "caption": "Home station: enter a name, search, then check the station below and apply" },
+        { "type": "Label", "caption": "Home station: enter a name or EVA number, search, then check the station below and apply" },
         {
             "type": "RowLayout",
             "items": [
-                { "type": "ValidationTextBox", "name": "StationSearch", "caption": "Search station", "width": "300px" },
+                { "type": "ValidationTextBox", "name": "StationSearch", "caption": "Station name or EVA number", "width": "300px" },
                 { "type": "Button", "caption": "Search", "onClick": "IPS_RequestAction($id, 'SearchStation', $StationSearch);" }
             ]
         },

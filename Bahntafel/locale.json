@@ -21,7 +21,6 @@
             "Walking time to the station, relaxed (0 = off)": "Wegezeit zum Bahnhof, entspannt (0 = aus)",
             "Of that, saved by hurrying (\"tight\")": "davon zügig einsparbar („knapp“)",
             "Update interval": "Aktualisierungsintervall",
-            "Search station": "Bahnhof suchen",
             "Search": "Suchen",
             "Test connection": "Verbindung testen",
             "Name instance after the station": "Instanz nach Bahnhof benennen",
@@ -39,9 +38,10 @@
             "Departure": "Abfahrt",
             "Arrival": "Ankunft",
             "Access to the DB API Marketplace (APIs \"OpenBoards\" and \"OpenStation\")": "Zugang zum DB API Marketplace (APIs „OpenBoards“ und „OpenStation“)",
-            "Home station: enter a name, search, then check the station below and apply": "Heimatbahnhof: Namen eingeben, suchen, darunter den Bahnhof prüfen und übernehmen",
             "Direction (optional): only trains that stop at this station, on departures after, on arrivals before the home station; the list contains the stations of the loaded trains": "Richtung (optional): nur Züge, die an diesem Bahnhof halten – bei Abfahrt danach, bei Ankunft davor; die Liste enthält die Bahnhöfe der geladenen Züge",
-            "The station search needs a subscription to the API OpenStation in the DB API Marketplace.": "Die Bahnhofssuche braucht ein Abo der API OpenStation im DB API Marketplace."
+            "The station search needs a subscription to the API OpenStation in the DB API Marketplace.": "Die Bahnhofssuche braucht ein Abo der API OpenStation im DB API Marketplace.",
+            "Station name or EVA number": "Bahnhofsname oder EVA-Nummer",
+            "Home station: enter a name or EVA number, search, then check the station below and apply": "Heimatbahnhof: Namen oder EVA-Nummer eingeben, suchen, darunter den Bahnhof prüfen und übernehmen"
         }
     }
 }
