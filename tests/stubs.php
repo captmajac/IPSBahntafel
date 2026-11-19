@@ -48,6 +48,7 @@ class IPSModule
     public array $status = [];
     public array $visu = [];          // UpdateVisualizationValue payloads
     public array $formUpdates = [];   // [Field, Parameter, Value]
+    public int $formReloads = 0;
     public array $messages = [];      // [SenderID, Message]
     public int $visualizationType = 0;
 
@@ -123,6 +124,7 @@ class IPSModule
     protected function SetVisualizationType($Type) { $this->visualizationType = $Type; }
     protected function UpdateVisualizationValue($Value) { $this->visu[] = $Value; }
     protected function UpdateFormField($Field, $Parameter, $Value) { $this->formUpdates[] = [$Field, $Parameter, $Value]; }
+    protected function ReloadForm() { $this->formReloads++; }
 
     // test helper
     public function value($Ident) { return TestRegistry::$values[$this->variables[$Ident]]; }

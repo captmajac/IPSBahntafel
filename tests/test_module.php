@@ -257,7 +257,7 @@ $tests['Module: extended notes setting'] = function () {
 $tests['Module: search through OpenStation'] = function () {
     $m = makeBoard(['Station' => '']);
     $m->RequestAction('SearchStation', 'WohnortBahnhof');
-    check(count(lastFormUpdate($m, 'Station')) === 3, 'none, WohnortBahnhof and Nord');
+    check(count(lastFormUpdate($m, 'Station')) === 4, 'none, WohnortBahnhof, Nord and Süd');
 };
 
 $tests['Module: test connection names the station'] = function () {
@@ -313,4 +313,9 @@ $tests['Module: search by EVA number, without OpenStation'] = function () {
     check(!requested('open-station'), 'no OpenStation request');
     TestRegistry::$http = fakeHttp([]);
     check(str_contains(popup($m, fn () => $m->RequestAction('SearchStation', '8099999')), 'No station found'), 'unknown');
+};
+
+$tests['Module: applying reloads the form, so the route list shows the new trains'] = function () {
+    $m = makeBoard();
+    check($m->formReloads > 0, 'reloaded after apply');
 };

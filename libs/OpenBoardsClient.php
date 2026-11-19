@@ -41,7 +41,7 @@ class OpenBoardsClient implements BoardSource
             // direct children only: quays have names and keys of their own
             foreach ($stopPlace->childNodes as $child) {
                 if ($child->localName === 'Name') {
-                    $name = trim($child->textContent);
+                    $name = self::text($child);
                 } elseif ($child->localName === 'keyList') {
                     foreach ($child->getElementsByTagNameNS('*', 'KeyValue') as $keyValue) {
                         $key = $keyValue->getElementsByTagNameNS('*', 'Key')->item(0);
@@ -57,6 +57,21 @@ class OpenBoardsClient implements BoardSource
             }
         }
         return array_values($stations);
+    }
+
+    // a NeTEx name is plain text or one Text per language: the German one, else the first
+    private static function text(DOMElement $name): string
+    {
+        $texts = $name->getElementsByTagNameNS('*', 'Text');
+        if ($texts->length === 0) {
+            return trim($name->textContent);
+        }
+        foreach ($texts as $text) {
+            if (str_starts_with($text->getAttribute('lang'), 'de')) {
+                return trim($text->textContent);
+            }
+        }
+        return trim($texts->item(0)->textContent);
     }
 
     // name from the stopPlaces of a board; works without OpenStation. The longest window the API allows (8 h),

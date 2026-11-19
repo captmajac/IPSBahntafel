@@ -99,6 +99,7 @@ class Bahntafel extends IPSModule
             $this->SetTimerInterval('Update', 0);
             $this->SetTimerInterval('Recalc', 0);
             $this->render();
+            $this->ReloadForm();
             return;
         }
         $this->SetStatus(102);
@@ -109,6 +110,8 @@ class Bahntafel extends IPSModule
         } else {
             $this->render();
         }
+        // an open form shows the new station and the route stations of its trains
+        $this->ReloadForm();
     }
 
     public function GetConfigurationForm()

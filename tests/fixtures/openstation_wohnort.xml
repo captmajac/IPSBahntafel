@@ -26,6 +26,15 @@
                             </keyList>
                             <Name lang="de">WohnortBahnhof Nord</Name>
                         </StopPlace>
+                        <StopPlace version="1" id="dhid:de:00000:8099011">
+                            <keyList>
+                                <KeyValue><Key>EVA</Key><Value>8099011</Value></KeyValue>
+                            </keyList>
+                            <Name>
+                                <Text lang="de">WohnortBahnhof Süd</Text>
+                                <Text lang="en">WohnortBahnhof South</Text>
+                            </Name>
+                        </StopPlace>
                         <StopPlace version="1" id="dhid:de:00000:9999">
                             <keyList>
                                 <KeyValue><Key>RIL</Key><Value>XWB</Value></KeyValue>

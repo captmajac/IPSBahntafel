@@ -120,7 +120,7 @@ $tests['OpenBoards: errors'] = function () {
 
 $tests['OpenStation: search gives eva and name'] = function () {
     $stations = (new OpenBoardsClient('id', 'key', openBoardsHttp()))->searchStations('WohnortBahnhof');
-    check($stations === [['eva' => '8099001', 'name' => 'WohnortBahnhof'], ['eva' => '8099010', 'name' => 'WohnortBahnhof Nord']], json_encode($stations));
+    check($stations === [['eva' => '8099001', 'name' => 'WohnortBahnhof'], ['eva' => '8099010', 'name' => 'WohnortBahnhof Nord'], ['eva' => '8099011', 'name' => 'WohnortBahnhof Süd']], json_encode($stations));
     check(str_ends_with(TestRegistry::$calls[0][0], '/open-station/v1/netex?stopPlaceName=WohnortBahnhof&limit=20'), TestRegistry::$calls[0][0]);
     check(TestRegistry::$calls[0][2] === null, 'GET');
     check((new OpenBoardsClient('id', 'key', openBoardsHttp()))->searchStations('Nirgendwo') === [], 'nothing found');
