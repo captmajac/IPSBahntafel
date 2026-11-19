@@ -21,16 +21,42 @@ Gedacht für das Tablet zu Hause: „Wann muss ich los?“ und „Wann kommt mei
 
 Über den Module Store oder in der Konsole unter *Module Control* die URL `https://github.com/captmajac/IPSBahntafel` hinzufügen.
 
-## Entwicklung
+## Konfiguration
 
-```bash
-../tools/php/php tests/run.php
-```
+Die Einstellungen der Instanz *Bahntafel* sind in vier aufklappbare Bereiche gegliedert.
 
-Die Tests laufen ohne Symcon-Server. Die Kachel lässt sich lokal ansehen:
+**Zugang zur DB API**
 
-```bash
-../tools/php/php -S 127.0.0.1:8765
-```
+| Einstellung | Bedeutung |
+|---|---|
+| Client-ID, API-Key | Zugangsdaten einer Anwendung im DB API Marketplace, die OpenBoards und OpenStation abonniert hat |
+| Aktualisierungsintervall | Wie oft die Tafel abgerufen wird, 15 bis 240 Minuten, Standard 60. Ein Abruf sind 2 API-Aufrufe. |
+| Verbindung testen | Prüft die Zugangsdaten und meldet den Namen des Bahnhofs |
 
-Danach `http://127.0.0.1:8765/tests/tile-preview.php` öffnen. Echte API-Antworten holt `tests/capture-openboards.php`, das als Skript in IP-Symcon läuft, siehe `tests/fixtures/README.md`.
+**Heimat- und Zielbahnhof**
+
+| Einstellung | Bedeutung |
+|---|---|
+| Bahnhofsname oder EVA-Nummer | Suchbegriff. Ein Name wird über OpenStation gesucht, eine 7-stellige EVA-Nummer direkt über OpenBoards. |
+| Heimatbahnhof | Bahnhof der Tafel. Nach der Suche steht hier der erste Treffer, weitere Treffer sind wählbar. |
+| Zielbahnhof | Optional. Abfahrt zeigt nur Züge nach diesem Bahnhof, Ankunft nur Züge von dort. „(alle Züge)“ zeigt alle. Die Liste füllt sich mit den Bahnhöfen der Züge, sobald ein Heimatbahnhof gewählt ist. |
+
+**Anzeige**
+
+| Einstellung | Bedeutung |
+|---|---|
+| Züge | Angezeigte Gattungen: Fernverkehr, Regionalverkehr, S-Bahn, Bus, Tram, Sonstige |
+| Erweiterte Hinweise | Zusätzlich Hinweise wie „Ein Wagen fehlt“ oder „Heute nur einteilig“. Ohne Haken nur Verspätungsgründe und Störungen. |
+| Zeilen auf der Tafel | 1 bis 20, Standard 10 |
+| Instanz nach Bahnhof benennen | Benennt die Instanz und damit die Kachel nach dem Heimatbahnhof, nur auf Klick |
+
+**Erreichbarkeit (nur Abfahrt)**
+
+| Einstellung | Bedeutung |
+|---|---|
+| Wegezeit zum Bahnhof, entspannt | Minuten von zu Hause zum Bahnhof, 0 schaltet die Erreichbarkeit aus |
+| davon zügig einsparbar | Minuten, die man zügig schneller ist. Züge in dieser Spanne gelten als *knapp*. |
+
+Die Tafel markiert jeden Zug als *erreichbar* (grün), *knapp* (orange) oder *nicht erreichbar* (rot). Schritt für Schritt beschreibt es [Bahntafel: Einrichten](Bahntafel/README.md#4-einrichten-der-instanzen-in-ip-symcon).
+
+Zum Entwickeln und lokalen Testen siehe [tests/README.md](tests/README.md).
