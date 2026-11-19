@@ -131,8 +131,8 @@ Erst OpenBoards versuchen, bei 401/403 Timetables.
 
 ### Modul
 
-- Neue Eigenschaft `Api`: 1 = OpenBoards (Standard für neue Instanzen), 0 = Timetables. Im Formular steht sie ganz oben als Auswahl „Datenquelle“ mit dem Hinweis auf die Abschaltung Mitte 2027.
-- **Bestandsschutz:** IP-Symcon gibt einer neu registrierten Eigenschaft auch in bestehenden Instanzen den Standardwert. Darum setzt `ApplyChanges` die Eigenschaft einmalig auf Timetables, wenn die Instanz schon einmal Daten geladen hat (`FetchedAt > 0`) und das Attribut `ApiMigrated` noch leer ist. Danach entscheidet nur noch der Nutzer. Das ist die einzige automatische Änderung einer Eigenschaft. Sie erhält den bisherigen Zustand und ändert keinen Namen und kein Icon.
+- Neue Eigenschaft `Api`: 0 = Standard, 1 = OpenBoards, 2 = Timetables. Im Formular steht sie ganz oben als Auswahl „Datenquelle“ mit dem Hinweis auf die Abschaltung Mitte 2027. Die Option 0 zeigt, was der Standard dieser Instanz ist, z. B. „Standard (Timetables)“.
+- **Bestandsschutz ohne Selbstkonfiguration:** Das Modul darf seine Eigenschaften nicht selbst setzen (Konventions-Test gegen `IPS_SetProperty`). Darum entscheidet ein Attribut `DefaultApi`, was „Standard“ bedeutet. `ApplyChanges` setzt es einmalig, solange es leer ist: `timetables`, wenn die Instanz schon Daten geladen hat (`FetchedAt > 0`), sonst `openboards`. Das passiert vor dem Zurücksetzen der Trips. Neue Instanzen bekommen so OpenBoards, bestehende behalten Timetables, bis der Nutzer „OpenBoards“ wählt.
 - `client(): BoardSource` liefert je nach `Api` den passenden Client.
 - **Bahnhofswahl:** Die Suche bleibt wie heute (Feld „Bahnhof suchen“ und Auswahl). Darunter kommt ein Feld „EVA-Nummer“ mit der Schaltfläche „Übernehmen“. Sie ruft bei OpenBoards `stationByEva` auf und trägt Name und EVA als Auswahl ein, wie ein Suchtreffer. Die README empfiehlt, OpenStation zusammen mit OpenBoards zu abonnieren. Die EVA-Eingabe ist nur der Ausweg ohne dieses Abo.
 - Neue Eigenschaft `ExtendedMessages` (Checkbox „Erweiterte Hinweise“, Standard aus). `BoardBuilder` hängt mit `settings['extended']` die `extraMessages` an die `messages` der Zeile an.
